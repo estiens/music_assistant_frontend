@@ -1316,18 +1316,29 @@ const loadGenreOptions = async () => {
   if (!props.showGenreFilter) return;
 
   try {
-    const genres = await api.getLibraryGenres(
-      undefined,
-      undefined,
-      100,
-      0,
-      "name",
-    );
+    const pageSize = 100;
+    const all: { label: string; value: number }[] = [];
+    let offset = 0;
+    let page: Awaited<ReturnType<typeof api.getLibraryGenres>>;
 
-    genreOptions.value = genres.map((genre) => ({
-      label: genre.name,
-      value: Number(genre.item_id),
-    }));
+    do {
+      page = await api.getLibraryGenres(
+        undefined,
+        undefined,
+        pageSize,
+        offset,
+        "name",
+        undefined,
+        undefined,
+        true, // always hide empty genres in the filter dropdown
+      );
+      for (const genre of page) {
+        all.push({ label: genre.name, value: Number(genre.item_id) });
+      }
+      offset += pageSize;
+    } while (page.length === pageSize);
+
+    genreOptions.value = all;
   } catch {
     toast.error(t("error_loading_genres"));
   }
