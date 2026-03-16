@@ -1024,6 +1024,8 @@
         "album_artist_filter": "Toggle album-artist filter",
         "hide_empty_genres": "Hide empty genres",
         "show_empty_genres": "Show empty genres",
+        "show_only_default_genres": "Show only default genres",
+        "show_all_genres": "Show all genres",
         "explicit": "Explicit",
         "filter_library": "Toggle in-library\/favorite filter",
         "library": "Toggle in-library\/favorite",
