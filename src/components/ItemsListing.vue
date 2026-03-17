@@ -211,7 +211,7 @@ import type { Component } from "vue";
 
 import Container from "@/components/Container.vue";
 import GenreIcon from "@/components/icons/GenreIcon.vue";
-import { Eye, EyeClosed, Star } from "lucide-vue-next";
+import { Eye, EyeClosed, Layers } from "lucide-vue-next";
 import ListViewSkeleton from "@/components/skeletons/ListViewSkeleton.vue";
 import PanelViewSkeleton from "@/components/skeletons/PanelViewSkeleton.vue";
 import Toolbar, { ToolBarMenuItem } from "@/components/Toolbar.vue";
@@ -925,7 +925,7 @@ const menuItems = computed(() => {
           : hef === null
             ? "tooltip.show_all_genres"
             : "tooltip.hide_empty_genres",
-      icon: hef === true ? EyeClosed : hef === null ? Star : Eye,
+      icon: hef === true ? EyeClosed : hef === null ? Layers : Eye,
       action: toggleHideEmptyFilter,
       active: hef === true || hef === null,
       overflowAllowed: true,
