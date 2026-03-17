@@ -235,6 +235,7 @@ import {
   ProviderType,
   Radio,
   type Album,
+  type Genre,
   type MediaItemType,
   type Track,
 } from "@/plugins/api/interfaces";
@@ -1319,7 +1320,7 @@ const loadGenreOptions = async () => {
     const pageSize = 100;
     const all: { label: string; value: number }[] = [];
     let offset = 0;
-    let page: Awaited<ReturnType<typeof api.getLibraryGenres>>;
+    let page: Genre[];
 
     do {
       page = await api.getLibraryGenres(
