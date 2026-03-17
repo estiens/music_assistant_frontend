@@ -2,7 +2,7 @@
   <div>
     <Toolbar
       :is-discover-page="true"
-      :icon="House"
+      :icon="Compass"
       color="background"
       :title="$t('discover')"
     />
@@ -49,7 +49,7 @@ import Toolbar from "@/components/Toolbar.vue";
 import { api } from "@/plugins/api";
 import { authManager } from "@/plugins/auth";
 import { eventbus } from "@/plugins/eventbus";
-import { House } from "lucide-vue-next";
+import { Compass } from "lucide-vue-next";
 import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
