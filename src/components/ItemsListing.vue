@@ -211,7 +211,7 @@ import type { Component } from "vue";
 
 import Container from "@/components/Container.vue";
 import GenreIcon from "@/components/icons/GenreIcon.vue";
-import { Eye, EyeClosed } from "lucide-vue-next";
+import { Eye, EyeClosed, Layers } from "lucide-vue-next";
 import ListViewSkeleton from "@/components/skeletons/ListViewSkeleton.vue";
 import PanelViewSkeleton from "@/components/skeletons/PanelViewSkeleton.vue";
 import Toolbar, { ToolBarMenuItem } from "@/components/Toolbar.vue";
@@ -266,7 +266,7 @@ export interface LoadDataParams {
   favoritesOnly?: boolean;
   albumArtistsFilter?: boolean;
   libraryOnly?: boolean;
-  hideEmptyFilter?: boolean;
+  hideEmptyFilter?: boolean | null;
   refresh?: boolean;
   albumType?: string[];
   provider?: string[];
@@ -490,7 +490,15 @@ const toggleAlbumArtistsFilter = function () {
 };
 
 const toggleHideEmptyFilter = function () {
-  params.value.hideEmptyFilter = !params.value.hideEmptyFilter;
+  const current = params.value.hideEmptyFilter;
+  // cycle: undefined/false (all) → true (hide empty) → null (defaults only) → false (all)
+  if (current === true) {
+    params.value.hideEmptyFilter = null;
+  } else if (current === null) {
+    params.value.hideEmptyFilter = false;
+  } else {
+    params.value.hideEmptyFilter = true;
+  }
   setItemsListingPreference(
     props.path || props.itemtype,
     props.itemtype,
@@ -907,15 +915,19 @@ const menuItems = computed(() => {
     });
   }
 
-  // has media mappings filter (hide empty genres)
+  // has media mappings filter (hide empty genres / show only defaults)
   if (props.showHideEmptyFilter === true) {
+    const hef = params.value.hideEmptyFilter;
     items.push({
-      label: params.value.hideEmptyFilter
-        ? "tooltip.show_empty_genres"
-        : "tooltip.hide_empty_genres",
-      icon: params.value.hideEmptyFilter ? EyeClosed : Eye,
+      label:
+        hef === true
+          ? "tooltip.show_only_default_genres"
+          : hef === null
+            ? "tooltip.show_all_genres"
+            : "tooltip.hide_empty_genres",
+      icon: hef === true ? EyeClosed : hef === null ? Layers : Eye,
       action: toggleHideEmptyFilter,
-      active: params.value.hideEmptyFilter,
+      active: hef === true || hef === null,
       overflowAllowed: true,
     });
   }
@@ -1185,7 +1197,7 @@ const restoreSettings = async function () {
     params.value.albumArtistsFilter = prefs.albumArtistsFilter;
   }
 
-  // get stored/default hideEmptyFilter for this itemtype (default: on)
+  // get stored/default hideEmptyFilter for this itemtype (default: true = hide empty)
   if (props.showHideEmptyFilter) {
     params.value.hideEmptyFilter =
       prefs.hideEmptyFilter !== undefined ? prefs.hideEmptyFilter : true;
