@@ -21,7 +21,6 @@
         v-for="item in getAllFilteredProviders()"
         :key="item.instance_id"
         link
-        :prepend-gap="8"
         :show-menu-btn="true"
         :class="{
           'provider-disabled': !item.enabled,
