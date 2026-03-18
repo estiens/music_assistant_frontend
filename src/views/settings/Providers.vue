@@ -379,8 +379,8 @@ const editProvider = function (providerInstanceId: string) {
   router.push(`/settings/editprovider/${providerInstanceId}`);
 };
 
-const shouldShowStageBadge = function (stage?: string) {
-  return !!stage && stage !== "stable";
+const shouldShowStageBadge = function (stage?: ProviderStage) {
+  return !!stage && stage !== ProviderStage.STABLE;
 };
 
 const toggleEnabled = function (config: ProviderConfig) {
