@@ -288,13 +288,16 @@ import { match } from "ts-pattern";
 import { computed, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter, type RouteLocationRaw } from "vue-router";
+import { useDisplay } from "vuetify";
 
 // global refs
 const router = useRouter();
 const { t } = useI18n();
 const { getPreference, setPreference } = useUserPreferences();
+const { mobile } = useDisplay();
 
 const settingsViewMode = ref<"list" | "card">("card");
+const settingsListPrependGap = computed(() => (mobile.value ? 4 : 24));
 const savedSettingsViewMode = getPreference<"list" | "card">(
   "settings.overview.viewMode",
   "card",
@@ -952,11 +955,15 @@ const documentationUrl = computed(() => {
 }
 
 .settings-list-item :deep(.v-list-item__prepend) {
-  margin-right: 8px;
+  margin-right: 4px;
 }
 
 .settings-list-item :deep(.v-list-item__prepend .v-icon) {
   margin-inline-end: 0 !important;
+}
+
+.settings-list-item :deep(.v-list-item__content > div) {
+  padding-left: 4px;
 }
 
 .settings-list-item :deep(.v-list-item-title) {
