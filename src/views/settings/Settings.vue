@@ -183,7 +183,6 @@
             v-for="section in providersSection"
             :key="section.name"
             link
-            :prepend-gap="settingsListPrependGap"
             class="settings-list-item"
             @click="router.push(section.route)"
           >
@@ -210,7 +209,6 @@
             v-for="section in playersSection"
             :key="section.name"
             link
-            :prepend-gap="settingsListPrependGap"
             class="settings-list-item"
             @click="router.push(section.route)"
           >
@@ -237,7 +235,6 @@
             v-for="section in otherSettingsSections"
             :key="section.name"
             link
-            :prepend-gap="settingsListPrependGap"
             class="settings-list-item"
             @click="router.push(section.route)"
           >
