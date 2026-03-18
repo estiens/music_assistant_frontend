@@ -312,6 +312,7 @@ import {
   EventType,
   ProviderConfig,
   ProviderFeature,
+  ProviderStage,
   ProviderType,
 } from "@/plugins/api/interfaces";
 import { eventbus } from "@/plugins/eventbus";
