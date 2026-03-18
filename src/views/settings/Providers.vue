@@ -21,6 +21,7 @@
         v-for="item in getAllFilteredProviders()"
         :key="item.instance_id"
         link
+        :prepend-gap="8"
         :show-menu-btn="true"
         :class="{
           'provider-disabled': !item.enabled,
@@ -77,26 +78,6 @@
 
         <template #append>
           <div class="provider-status-icons">
-            <v-chip
-              v-if="
-                item.type === ProviderType.PLAYER && getPlayerCount(item) > 0
-              "
-              size="x-small"
-              variant="flat"
-              color="primary"
-              class="player-count-chip"
-              @click.stop="viewPlayers(item.instance_id)"
-            >
-              <v-icon start size="small">mdi-speaker</v-icon>
-              {{
-                getPlayerCount(item) === 1
-                  ? $t("settings.one_player")
-                  : $t("settings.players_count", [
-                      getPlayerCount(item),
-                      getPlayerCount(item) !== 1 ? "s" : "",
-                    ])
-              }}
-            </v-chip>
             <v-icon
               v-if="
                 api.syncTasks.value.filter(
@@ -136,7 +117,9 @@
               :title="getProviderTypeTitle(item.type)"
             />
             <v-chip
-              v-if="api.providerManifests[item.domain]"
+              v-if="
+                shouldShowStageBadge(api.providerManifests[item.domain]?.stage)
+              "
               size="x-small"
               variant="flat"
               class="mx-1 text-uppercase"
@@ -237,7 +220,9 @@
             </v-btn>
 
             <v-chip
-              v-if="api.providerManifests[item.domain]"
+              v-if="
+                shouldShowStageBadge(api.providerManifests[item.domain]?.stage)
+              "
               size="x-small"
               variant="flat"
               class="mx-1 text-uppercase"
@@ -301,30 +286,6 @@
           >
             {{ api.providerManifests[item.domain].description }}
           </v-card-text>
-
-          <!-- Player count badge for player providers -->
-          <v-card-text
-            v-if="item.type === ProviderType.PLAYER && getPlayerCount(item) > 0"
-            class="provider-players-count mt-auto"
-          >
-            <v-chip
-              size="small"
-              variant="flat"
-              color="primary"
-              class="player-count-chip"
-              @click.stop="viewPlayers(item.instance_id)"
-            >
-              <v-icon start size="small">mdi-speaker</v-icon>
-              {{
-                getPlayerCount(item) === 1
-                  ? $t("settings.one_player")
-                  : $t("settings.players_count", [
-                      getPlayerCount(item),
-                      getPlayerCount(item) !== 1 ? "s" : "",
-                    ])
-              }}
-            </v-chip>
-          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -346,11 +307,10 @@ import ListItem from "@/components/ListItem.vue";
 import ProviderFilters from "@/components/ProviderFilters.vue";
 import ProviderIcon from "@/components/ProviderIcon.vue";
 import { Button } from "@/components/ui/button";
-import { isHiddenSendspinWebPlayer, openLinkInNewTab } from "@/helpers/utils";
+import { openLinkInNewTab } from "@/helpers/utils";
 import { api } from "@/plugins/api";
 import {
   EventType,
-  PlayerConfig,
   ProviderConfig,
   ProviderFeature,
   ProviderType,
@@ -389,7 +349,6 @@ const addProviderLabel = computed(() => {
 const providerConfigs = ref<ProviderConfig[]>([]);
 const searchQuery = ref<string>("");
 const showAddProviderDialog = ref<boolean>(false);
-const playerConfigs = ref<PlayerConfig[]>([]);
 
 // listen for item updates to refresh items when that happens
 const unsub = api.subscribe(EventType.PROVIDERS_UPDATED, () => {
@@ -407,7 +366,6 @@ const loadItems = async function () {
     return;
   }
   providerConfigs.value = await api.getProviderConfigs();
-  playerConfigs.value = await api.getPlayerConfigs();
 };
 
 const removeProvider = function (providerInstanceId: string) {
@@ -421,31 +379,8 @@ const editProvider = function (providerInstanceId: string) {
   router.push(`/settings/editprovider/${providerInstanceId}`);
 };
 
-const viewPlayers = function (providerInstanceId: string) {
-  const providerInstance = api.getProvider(providerInstanceId);
-  if (providerInstance) {
-    router.push({
-      name: "playersettings",
-      query: { providers: providerInstance.instance_id },
-    });
-  }
-};
-
-const getPlayerCount = function (providerConfig: ProviderConfig): number {
-  if (providerConfig.type !== ProviderType.PLAYER) return 0;
-  const providerInstance = api.getProvider(providerConfig.instance_id);
-  if (!providerInstance) return 0;
-
-  return playerConfigs.value.filter((playerConfig) => {
-    if (isHiddenSendspinWebPlayer(playerConfig)) return false;
-
-    const playerProviderInstance = api.getProvider(playerConfig.provider);
-    return (
-      playerProviderInstance?.instance_id === providerInstance.instance_id ||
-      playerConfig.provider === providerInstance.instance_id ||
-      playerConfig.provider === providerInstance.domain
-    );
-  }).length;
+const shouldShowStageBadge = function (stage?: string) {
+  return !!stage && stage !== "stable";
 };
 
 const toggleEnabled = function (config: ProviderConfig) {
@@ -726,24 +661,16 @@ const getAllFilteredProviders = function () {
   cursor: pointer;
 }
 
-.provider-players-count {
-  padding-top: 12px !important;
-  padding-bottom: 12px !important;
-  margin-top: auto;
-  align-content: end;
-}
-
-.player-count-chip {
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.player-count-chip:hover {
-  transform: scale(1.05);
-}
-
 .providers-list {
   background: transparent;
+}
+
+.providers-list :deep(.v-list-item__prepend) {
+  margin-right: 4px;
+}
+
+.providers-list :deep(.v-list-item__content > div) {
+  padding-left: 4px;
 }
 
 .provider-name-title {
@@ -794,23 +721,10 @@ const getAllFilteredProviders = function () {
     gap: 4px;
     min-width: 0;
   }
-
-  .player-count-chip {
-    flex-shrink: 1;
-  }
-}
-
-.player-count-chip {
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.player-count-chip:hover {
-  transform: scale(1.05);
 }
 
 .provider-icon {
-  margin-right: 12px;
+  margin-right: 0;
 }
 
 .provider-disabled {
