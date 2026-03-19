@@ -168,18 +168,9 @@ const props = defineProps<{
 }>();
 
 // computed properties
-const EXCLUDED_CONFIG_KEYS = new Set([
-  "qr_show_instruction_text",
-  "qr_instruction_text",
-]);
-
 const allConfigEntries = computed(() => {
   if (!config.value) return [];
-  // Exclude these entries from EditConfig; they are intentionally
-  // not included in the submitted payload or preserved on save.
-  return Object.values(config.value.values).filter(
-    (entry) => !EXCLUDED_CONFIG_KEYS.has(entry.key),
-  );
+  return Object.values(config.value.values);
 });
 
 onMounted(() => {
