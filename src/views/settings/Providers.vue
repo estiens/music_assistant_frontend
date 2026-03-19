@@ -15,7 +15,10 @@
       ])
     }}
   </div>
-  <Container :variant="viewMode === 'list' ? 'default' : 'panel'" class="mt-4">
+  <Container
+    :variant="viewMode === 'list' ? 'default' : 'panel'"
+    class="mt-4 px-5"
+  >
     <v-list v-if="viewMode === 'list'" class="providers-list">
       <ListItem
         v-for="item in getAllFilteredProviders()"
