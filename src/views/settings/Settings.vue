@@ -813,6 +813,12 @@ const documentationUrl = computed(() => {
   gap: 16px;
 }
 
+@media (max-width: 768px) {
+  .settings-featured {
+    grid-template-columns: 1fr;
+  }
+}
+
 .settings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
