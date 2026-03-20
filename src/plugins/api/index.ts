@@ -919,6 +919,9 @@ export class MusicAssistantApi {
    * @param offset - Number of items to skip
    * @param order_by - Order by field (e.g. 'sort_name', 'timestamp_added')
    * @param provider - Filter by provider instance ID or domain (single string or list)
+   * @param genre - Filter by genre ID(s)
+   * @param hide_empty - Hide genres with no associated media items
+   * @param media_type - Filter to genres that have at least one item of this media type
    * @returns Promise resolving to array of genres
    */
   public getLibraryGenres(
@@ -930,6 +933,7 @@ export class MusicAssistantApi {
     provider?: string | string[],
     genre?: number | number[],
     hide_empty?: boolean | null,
+    media_type?: MediaType,
   ): Promise<Genre[]> {
     return this.sendCommand("music/genres/library_items", {
       favorite,
@@ -940,6 +944,7 @@ export class MusicAssistantApi {
       provider,
       genre,
       hide_empty,
+      media_type,
     });
   }
 
