@@ -108,12 +108,6 @@
               color="grey"
               :title="$t('settings.not_loaded')"
             />
-            <v-icon
-              :icon="getProviderTypeIcon(item.type)"
-              size="20"
-              color="grey"
-              :title="getProviderTypeTitle(item.type)"
-            />
             <v-chip
               v-if="
                 shouldShowStageBadge(api.providerManifests[item.domain]?.stage)
@@ -202,15 +196,6 @@
               :title="$t('settings.not_loaded')"
             >
               <v-icon icon="mdi-timer-sand" />
-            </v-btn>
-
-            <v-btn
-              variant="text"
-              size="small"
-              icon
-              :title="getProviderTypeTitle(item.type)"
-            >
-              <v-icon :icon="getProviderTypeIcon(item.type)" />
             </v-btn>
 
             <v-chip
@@ -302,7 +287,7 @@ import ProviderFilters from "@/components/ProviderFilters.vue";
 import ProviderIcon from "@/components/ProviderIcon.vue";
 import { Button } from "@/components/ui/button";
 import { useBackgroundTasks } from "@/composables/useBackgroundTasks";
-import { isHiddenSendspinWebPlayer, openLinkInNewTab } from "@/helpers/utils";
+import { openLinkInNewTab } from "@/helpers/utils";
 import { api } from "@/plugins/api";
 import {
   EventType,
@@ -315,8 +300,8 @@ import { eventbus } from "@/plugins/eventbus";
 import { $t } from "@/plugins/i18n";
 import { Plus } from "lucide-vue-next";
 import { match } from "ts-pattern";
-import { useRoute, useRouter } from "vue-router";
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import AddProviderDialog from "./AddProviderDialog.vue";
 
 // global refs
@@ -573,16 +558,6 @@ const getProviderTypeTitle = function (type: ProviderType) {
     .with(ProviderType.METADATA, () => $t("settings.metadata"))
     .with(ProviderType.PLUGIN, () => $t("settings.plugin"))
     .otherwise(() => $t("settings.player"));
-};
-
-const getProviderTypeIcon = function (type: ProviderType) {
-  const iconMap = {
-    [ProviderType.MUSIC]: "mdi-music",
-    [ProviderType.PLAYER]: "mdi-speaker",
-    [ProviderType.METADATA]: "mdi-file-code",
-    [ProviderType.PLUGIN]: "mdi-puzzle",
-  };
-  return iconMap[type] || "mdi-help-circle";
 };
 
 const getAllFilteredProviders = function () {
