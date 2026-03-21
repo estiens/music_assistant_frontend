@@ -25,7 +25,7 @@
 
     <Container
       :variant="viewMode === 'list' ? 'default' : 'panel'"
-      class="mt-4"
+      class="mt-4 px-5"
     >
       <div v-if="showInitialLoading" class="empty-state">
         <v-progress-circular indeterminate color="primary" size="48" />
@@ -92,11 +92,11 @@
 </template>
 
 <script setup lang="ts">
-import BackgroundTaskFilters from "@/components/settings/background-tasks/BackgroundTaskFilters.vue";
+import Container from "@/components/Container.vue";
 import BackgroundTaskDetailsDialog from "@/components/settings/background-tasks/BackgroundTaskDetailsDialog.vue";
+import BackgroundTaskFilters from "@/components/settings/background-tasks/BackgroundTaskFilters.vue";
 import BackgroundTaskItem from "@/components/settings/background-tasks/BackgroundTaskItem.vue";
 import BackgroundTaskScheduleDialog from "@/components/settings/background-tasks/BackgroundTaskScheduleDialog.vue";
-import Container from "@/components/Container.vue";
 import { Button } from "@/components/ui/button";
 import {
   canEditTaskSchedule,
