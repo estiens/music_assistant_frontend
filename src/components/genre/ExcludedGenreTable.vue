@@ -26,7 +26,7 @@
             <th
               class="h-10 px-6 text-left align-middle font-medium text-muted-foreground"
             >
-              {{ toSentenceCase($t("name")) }}
+              {{ toSentenceCase($t("genre_name")) }}
             </th>
             <th class="h-10 w-10 px-6"></th>
           </tr>

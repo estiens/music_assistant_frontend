@@ -55,7 +55,7 @@
             <th
               class="h-10 px-6 text-left align-middle font-medium text-muted-foreground"
             >
-              {{ toSentenceCase($t("name")) }}
+              {{ toSentenceCase($t("genre_name")) }}
             </th>
             <th
               class="hidden h-10 cursor-pointer select-none px-6 text-right align-middle font-medium text-muted-foreground hover:text-foreground sm:table-cell"
