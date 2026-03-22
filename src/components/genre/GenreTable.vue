@@ -249,12 +249,8 @@
             "
           >
             <td
-              colspan="3"
-              class="px-6 py-8 text-center text-muted-foreground sm:hidden"
-            ></td>
-            <td
               colspan="9"
-              class="hidden px-6 py-8 text-center text-muted-foreground sm:table-cell"
+              class="px-6 py-8 text-center text-muted-foreground"
             >
               {{ $t("no_content") }}
             </td>
@@ -374,21 +370,6 @@
   </div>
 </template>
 
-<script lang="ts">
-// Module-level timer so the debounce survives component unmount / navigation.
-let scanDebounceTimer: ReturnType<typeof setTimeout> | null = null;
-
-export function triggerGenreScanDebounced(
-  triggerFn: () => void,
-  delay = 10_000,
-) {
-  if (scanDebounceTimer) clearTimeout(scanDebounceTimer);
-  scanDebounceTimer = setTimeout(() => {
-    scanDebounceTimer = null;
-    triggerFn();
-  }, delay);
-}
-</script>
 
 <script setup lang="ts">
 import {
@@ -407,6 +388,7 @@ import { useRouter } from "vue-router";
 import { refDebounced } from "@vueuse/core";
 
 import GenreIcon from "@/components/icons/GenreIcon.vue";
+import { scheduleGenreScan } from "@/helpers/genre";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -437,7 +419,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{ excluded: [] }>();
 
 const router = useRouter();
 const { t, te } = useI18n();
@@ -601,7 +582,6 @@ const excludeGenre = async (itemId: string) => {
     await api.deleteGenre(itemId);
     allGenres.value = allGenres.value.filter((g) => g.item_id !== itemId);
     globalExclusions.value = await api.getGlobalGenreExclusions();
-    emit("excluded");
   } finally {
     pendingId.value = null;
   }
@@ -655,11 +635,7 @@ const restoreGenre = async (exclusion: GlobalGenreExclusion) => {
     if (store.prevState?.path === "librarygenres") {
       store.prevState = undefined;
     }
-    triggerGenreScanDebounced(() => {
-      api.triggerGenreScan().catch(() => {
-        // fire-and-forget; table and library view refresh via genre event subscription
-      });
-    });
+    scheduleGenreScan();
   } finally {
     restorePendingId.value = null;
   }

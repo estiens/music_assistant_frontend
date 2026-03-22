@@ -1,4 +1,18 @@
+import { api } from "@/plugins/api";
 import { MediaType } from "@/plugins/api/interfaces";
+
+// Module-level timer so the debounce survives component unmount / navigation.
+let scanDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+export function scheduleGenreScan(delay = 10_000) {
+  if (scanDebounceTimer) clearTimeout(scanDebounceTimer);
+  scanDebounceTimer = setTimeout(() => {
+    scanDebounceTimer = null;
+    api.triggerGenreScan().catch(() => {
+      // fire-and-forget; GenreTable and LibraryGenres refresh via genre event subscription
+    });
+  }, delay);
+}
 import GenreIcon from "@/components/icons/GenreIcon.vue";
 import { Route } from "lucide-vue-next";
 import type { Component } from "vue";
