@@ -6,11 +6,7 @@
         <Search
           class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
         />
-        <Input
-          v-model="searchQuery"
-          :placeholder="$t('search')"
-          class="pl-9"
-        />
+        <Input v-model="searchQuery" :placeholder="$t('search')" class="pl-9" />
       </div>
     </div>
 
@@ -52,7 +48,14 @@
               </div>
             </td>
             <td class="px-6 py-3 align-middle font-medium">
-              {{ getGenreDisplayName(exclusion.name, exclusion.translation_key, t, te) }}
+              {{
+                getGenreDisplayName(
+                  exclusion.name,
+                  exclusion.translation_key,
+                  t,
+                  te,
+                )
+              }}
             </td>
             <td class="px-6 py-3 align-middle">
               <Button
@@ -80,7 +83,9 @@
     <!-- Pagination footer -->
     <div class="flex items-center justify-between border-t px-6 py-3">
       <span class="text-sm text-muted-foreground">
-        {{ $t("settings.genre_table_page_info", [firstRow, lastRow, totalCount]) }}
+        {{
+          $t("settings.genre_table_page_info", [firstRow, lastRow, totalCount])
+        }}
       </span>
       <div class="flex items-center gap-2">
         <Button
@@ -159,14 +164,19 @@ const filteredExclusions = computed(() => {
 const totalCount = computed(() => {
   if (!debouncedSearch.value) return exclusions.value.length;
   const q = debouncedSearch.value.toLowerCase();
-  return exclusions.value.filter((e) => e.name.toLowerCase().includes(q)).length;
+  return exclusions.value.filter((e) => e.name.toLowerCase().includes(q))
+    .length;
 });
 
-const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / rowsPerPage)));
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(totalCount.value / rowsPerPage)),
+);
 const firstRow = computed(() =>
   totalCount.value === 0 ? 0 : (page.value - 1) * rowsPerPage + 1,
 );
-const lastRow = computed(() => Math.min(page.value * rowsPerPage, totalCount.value));
+const lastRow = computed(() =>
+  Math.min(page.value * rowsPerPage, totalCount.value),
+);
 const hasNextPage = computed(() => page.value * rowsPerPage < totalCount.value);
 
 const loadData = async () => {

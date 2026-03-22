@@ -29,7 +29,9 @@
           <ChartGantt class="size-4 text-primary" />
           <CardTitle>{{ $t("settings.genre_statistics") }}</CardTitle>
         </div>
-        <CardDescription>{{ $t("settings.genre_statistics_description") }}</CardDescription>
+        <CardDescription>{{
+          $t("settings.genre_statistics_description")
+        }}</CardDescription>
       </CardHeader>
       <CardContent class="p-0">
         <GenreTable :version="tableVersion" />
@@ -204,7 +206,10 @@ const fullRestore = async () => {
 
 onMounted(() => {
   loadScannerStatus();
-  scannerPollInterval = setInterval(loadScannerStatus, SCANNER_POLL_INTERVAL_MS);
+  scannerPollInterval = setInterval(
+    loadScannerStatus,
+    SCANNER_POLL_INTERVAL_MS,
+  );
 });
 
 onBeforeUnmount(() => {

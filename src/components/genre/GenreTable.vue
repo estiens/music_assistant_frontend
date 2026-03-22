@@ -1,7 +1,9 @@
 <template>
   <div>
     <!-- Controls -->
-    <div class="flex flex-wrap items-center justify-between gap-3 border-b px-6 py-3">
+    <div
+      class="flex flex-wrap items-center justify-between gap-3 border-b px-6 py-3"
+    >
       <div
         class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3"
       >
@@ -341,7 +343,9 @@
     <!-- Pagination footer -->
     <div class="flex items-center justify-between border-t px-6 py-3">
       <span class="text-sm text-muted-foreground">
-        {{ $t("settings.genre_table_page_info", [firstRow, lastRow, totalCount]) }}
+        {{
+          $t("settings.genre_table_page_info", [firstRow, lastRow, totalCount])
+        }}
       </span>
       <div class="flex items-center gap-2">
         <Button
@@ -586,7 +590,9 @@ const navigateToLibraryByGenre = (genre: Genre, mediaType: string) => {
 const countFor = (genreId: string, mediaType: string): string => {
   if (countsLoading.value) return "…";
   if (!allMediaCounts.value) return "—";
-  return ((allMediaCounts.value[genreId] ?? {})[mediaType] ?? 0).toLocaleString();
+  return (
+    (allMediaCounts.value[genreId] ?? {})[mediaType] ?? 0
+  ).toLocaleString();
 };
 
 const excludeGenre = async (itemId: string) => {
