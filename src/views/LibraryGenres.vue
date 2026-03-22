@@ -109,14 +109,21 @@ const handleGenreAdded = async () => {
   restoreState.value = true;
 };
 
-const triggerRefresh = async () => {
-  // Disable restore state temporarily to force fresh data load
-  restoreState.value = false;
+let refreshDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+const scheduleRefresh = () => {
+  // Signal immediately that the list may be stale (highlights the refresh button).
   updateAvailable.value = true;
-  refreshKey.value++;
-  // Re-enable restore state after a short delay
-  await new Promise((resolve) => setTimeout(resolve, 50));
-  restoreState.value = true;
+  // Debounce the actual reload so rapid events from a scan don't cause many
+  // remounts. We wait for the burst to settle before showing correct IDs.
+  if (refreshDebounceTimer) clearTimeout(refreshDebounceTimer);
+  refreshDebounceTimer = setTimeout(async () => {
+    refreshDebounceTimer = null;
+    restoreState.value = false;
+    refreshKey.value++;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    restoreState.value = true;
+  }, 1500);
 };
 
 onMounted(() => {
@@ -128,12 +135,13 @@ onMounted(() => {
     ],
     (evt: EventMessage) => {
       if (evt.object_id?.startsWith("library://genre")) {
-        triggerRefresh();
+        scheduleRefresh();
       }
     },
   );
 
   onBeforeUnmount(() => {
+    if (refreshDebounceTimer) clearTimeout(refreshDebounceTimer);
     unsub();
   });
 });

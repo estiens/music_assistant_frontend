@@ -14,6 +14,7 @@ import {
   type ErrorResultMessage,
   type EventMessage,
   type Genre,
+  type GlobalGenreExclusion,
   type MassEvent,
   type MediaItemType,
   type Player,
@@ -549,6 +550,12 @@ export class MusicAssistantApi {
     return this.sendCommand("music/genres/count", { favorite_only });
   }
 
+  public getGenreMediaCounts(
+    genre_ids: string[],
+  ): Promise<Record<string, Record<string, number>>> {
+    return this.sendCommand("music/genres/media_counts", { genre_ids });
+  }
+
   /**
    * Get Artists listing from the server.
    * @param favorite - Filter by favorite status
@@ -971,6 +978,22 @@ export class MusicAssistantApi {
   public removeGenreFromLibrary(item_id: string): Promise<void> {
     return this.sendCommand("music/genres/remove", {
       item_id,
+    });
+  }
+
+  public deleteGenre(item_id: string): Promise<void> {
+    return this.sendCommand("music/genres/remove", {
+      item_id,
+    });
+  }
+
+  public getGlobalGenreExclusions(): Promise<GlobalGenreExclusion[]> {
+    return this.sendCommand("music/genres/global_exclusions");
+  }
+
+  public removeGlobalGenreExclusion(exclusion_id: number): Promise<Genre> {
+    return this.sendCommand("music/genres/remove_global_exclusion", {
+      exclusion_id,
     });
   }
 
