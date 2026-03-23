@@ -28,9 +28,9 @@
     <div class="hidden shrink-0 items-center gap-2 sm:flex">
       <span class="text-sm text-muted-foreground">{{ rowsPerPageLabel }}</span>
       <NativeSelect v-model="rowsPerPage" class="w-20">
-        <option value="10">10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
+        <option v-for="opt in pageSizeOptions" :key="opt" :value="opt">
+          {{ opt }}
+        </option>
       </NativeSelect>
     </div>
   </div>
@@ -50,9 +50,12 @@ interface FilterOption {
 interface Props {
   filterOptions?: FilterOption[];
   rowsPerPageLabel: string;
+  pageSizeOptions?: string[];
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+  pageSizeOptions: () => ["10", "25", "50"],
+});
 
 const search = defineModel<string>("search", { default: "" });
 const filter = defineModel<string>("filter", { default: "" });

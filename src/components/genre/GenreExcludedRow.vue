@@ -16,31 +16,8 @@
       }}
     </td>
     <td
-      class="hidden px-6 py-3 align-middle text-right text-muted-foreground sm:table-cell"
-    >
-      —
-    </td>
-    <td
-      class="hidden px-6 py-3 align-middle text-right tabular-nums text-muted-foreground sm:table-cell"
-    >
-      —
-    </td>
-    <td
-      class="hidden px-6 py-3 align-middle text-right tabular-nums text-muted-foreground sm:table-cell"
-    >
-      —
-    </td>
-    <td
-      class="hidden px-6 py-3 align-middle text-right tabular-nums text-muted-foreground sm:table-cell"
-    >
-      —
-    </td>
-    <td
-      class="hidden px-6 py-3 align-middle text-right tabular-nums text-muted-foreground sm:table-cell"
-    >
-      —
-    </td>
-    <td
+      v-for="n in 6"
+      :key="n"
       class="hidden px-6 py-3 align-middle text-right tabular-nums text-muted-foreground sm:table-cell"
     >
       —

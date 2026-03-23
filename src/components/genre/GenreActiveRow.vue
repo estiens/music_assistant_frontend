@@ -93,7 +93,7 @@ interface Props {
   countFor: (mediaType: string) => string;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 const emit = defineEmits<{
   navigate: [];
   "navigate-library": [mediaType: string];

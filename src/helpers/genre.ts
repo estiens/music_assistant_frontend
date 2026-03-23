@@ -1,3 +1,7 @@
+import type { Component } from "vue";
+import { Route } from "lucide-vue-next";
+
+import GenreIcon from "@/components/icons/GenreIcon.vue";
 import { api } from "@/plugins/api";
 import { MediaType } from "@/plugins/api/interfaces";
 
@@ -13,10 +17,6 @@ export function scheduleGenreScan(delay = 10_000) {
     });
   }, delay);
 }
-
-import GenreIcon from "@/components/icons/GenreIcon.vue";
-import { Route } from "lucide-vue-next";
-import type { Component } from "vue";
 
 // Icon mapping for different media types in genre overview
 export const genreMediaTypeIconMap: Record<MediaType, string | Component> = {

@@ -123,7 +123,7 @@ import { refDebounced } from "@vueuse/core";
 
 import GenreActiveRow from "@/components/genre/GenreActiveRow.vue";
 import GenreExcludedRow from "@/components/genre/GenreExcludedRow.vue";
-import SortableHeader from "@/components/genre/SortableHeader.vue";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import { TableControls } from "@/components/ui/table-controls";
 import { TablePagination } from "@/components/ui/table-pagination";
 import { Spinner } from "@/components/ui/spinner";
