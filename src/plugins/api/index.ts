@@ -980,12 +980,6 @@ export class MusicAssistantApi {
     });
   }
 
-  public deleteGenre(item_id: string): Promise<void> {
-    return this.sendCommand("music/genres/remove", {
-      item_id,
-    });
-  }
-
   public getGlobalGenreExclusions(): Promise<Genre[]> {
     return this.sendCommand("music/genres/global_exclusions");
   }

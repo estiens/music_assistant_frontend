@@ -13,6 +13,7 @@ export function scheduleGenreScan(delay = 10_000) {
     });
   }, delay);
 }
+
 import GenreIcon from "@/components/icons/GenreIcon.vue";
 import { Route } from "lucide-vue-next";
 import type { Component } from "vue";

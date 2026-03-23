@@ -34,7 +34,10 @@
         }}</CardDescription>
       </CardHeader>
       <CardContent class="p-0">
-        <GenreTable :version="tableVersion" />
+        <GenreTable
+          :version="tableVersion"
+          @data-changed="onTableDataChanged"
+        />
       </CardContent>
     </Card>
 
@@ -201,6 +204,13 @@ const fullRestore = async () => {
     toast.error(t("settings.full_restore_failed"));
   } finally {
     fullRestoreInProgress.value = false;
+  }
+};
+
+const onTableDataChanged = async () => {
+  store.libraryGenresCount = await api.getLibraryGenresCount();
+  if (store.prevState?.path === "librarygenres") {
+    store.prevState = undefined;
   }
 };
 
