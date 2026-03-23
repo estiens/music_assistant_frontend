@@ -258,14 +258,14 @@
 
           <tr
             v-for="exclusion in filteredExclusions"
-            :key="`excl-${exclusion.id}`"
+            :key="`excl-${exclusion.item_id}`"
             class="group border-b transition-colors hover:bg-muted/50 opacity-50"
           >
             <td class="pl-6 pr-2 py-3 align-middle">
               <div class="flex size-8 items-center justify-center">
                 <img
-                  v-if="exclusion.metadata?.images?.[0]"
-                  :src="getMediaItemImageUrl(exclusion.metadata.images[0], 40)"
+                  v-if="getImageThumbForItem(exclusion, ImageType.THUMB, 40)"
+                  :src="getImageThumbForItem(exclusion, ImageType.THUMB, 40)"
                   class="size-8 rounded object-cover grayscale"
                 />
                 <GenreIcon v-else class="size-4 text-muted-foreground" />
@@ -318,11 +318,11 @@
                     variant="ghost"
                     size="icon"
                     class="size-7 opacity-0 group-hover:opacity-100"
-                    :disabled="restorePendingId === exclusion.id"
+                    :disabled="restorePendingId === exclusion.item_id"
                     @click="restoreGenre(exclusion)"
                   >
                     <Spinner
-                      v-if="restorePendingId === exclusion.id"
+                      v-if="restorePendingId === exclusion.item_id"
                       class="size-3.5"
                     />
                     <RefreshCw v-else class="size-3.5 text-primary" />
@@ -401,17 +401,12 @@ import {
 import {
   getGenreDisplayName,
   getImageThumbForItem,
-  getMediaItemImageUrl,
   toSentenceCase,
 } from "@/helpers/utils";
 import { EventType, ImageType } from "@/plugins/api/interfaces";
 import { api } from "@/plugins/api";
 import { store } from "@/plugins/store";
-import type {
-  EventMessage,
-  Genre,
-  GlobalGenreExclusion,
-} from "@/plugins/api/interfaces";
+import type { EventMessage, Genre } from "@/plugins/api/interfaces";
 
 interface Props {
   /** Increment to force a data refresh (e.g. after a restore operation). */
@@ -438,12 +433,12 @@ const filterOptions: { value: FilterMode; label: string }[] = [
 ];
 
 const allGenres = ref<Genre[]>([]);
-const globalExclusions = ref<GlobalGenreExclusion[]>([]);
+const globalExclusions = ref<Genre[]>([]);
 const allMediaCounts = ref<Record<string, Record<string, number>> | null>(null);
 const countsLoading = ref(false);
 const loading = ref(false);
 const pendingId = ref<string | null>(null);
-const restorePendingId = ref<number | null>(null);
+const restorePendingId = ref<string | null>(null);
 
 type SortColumn =
   | "aliases"
@@ -557,6 +552,7 @@ const loadCounts = async () => {
   }
 };
 
+
 const navigateToGenre = (genre: Genre) => {
   router.push({
     name: "genre",
@@ -622,12 +618,12 @@ onMounted(() => {
   });
 });
 
-const restoreGenre = async (exclusion: GlobalGenreExclusion) => {
-  restorePendingId.value = exclusion.id;
+const restoreGenre = async (exclusion: Genre) => {
+  restorePendingId.value = exclusion.item_id;
   try {
-    const restored = await api.removeGlobalGenreExclusion(exclusion.id);
+    const restored = await api.removeGlobalGenreExclusion(exclusion.item_id);
     globalExclusions.value = globalExclusions.value.filter(
-      (e) => e.id !== exclusion.id,
+      (e) => e.item_id !== exclusion.item_id,
     );
     allGenres.value = [...allGenres.value, restored].sort((a, b) =>
       (a.sort_name ?? a.name).localeCompare(b.sort_name ?? b.name),

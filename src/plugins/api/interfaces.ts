@@ -724,14 +724,6 @@ export interface Genre extends MediaItem {
   genre_aliases: string[] | null;
 }
 
-export interface GlobalGenreExclusion {
-  id: number;
-  name: string;
-  sort_name: string;
-  search_name: string;
-  translation_key?: string;
-  metadata?: MediaItemMetadata;
-}
 
 export interface BrowseFolder extends MediaItem {
   path?: string;

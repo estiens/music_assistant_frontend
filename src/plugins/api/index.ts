@@ -14,7 +14,6 @@ import {
   type ErrorResultMessage,
   type EventMessage,
   type Genre,
-  type GlobalGenreExclusion,
   type MassEvent,
   type MediaItemType,
   type Player,
@@ -987,13 +986,13 @@ export class MusicAssistantApi {
     });
   }
 
-  public getGlobalGenreExclusions(): Promise<GlobalGenreExclusion[]> {
+  public getGlobalGenreExclusions(): Promise<Genre[]> {
     return this.sendCommand("music/genres/global_exclusions");
   }
 
-  public removeGlobalGenreExclusion(exclusion_id: number): Promise<Genre> {
+  public removeGlobalGenreExclusion(genre_id: string): Promise<Genre> {
     return this.sendCommand("music/genres/remove_global_exclusion", {
-      exclusion_id,
+      genre_id,
     });
   }
 
