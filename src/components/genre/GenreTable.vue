@@ -248,10 +248,7 @@
               filteredExclusions.length === 0
             "
           >
-            <td
-              colspan="9"
-              class="px-6 py-8 text-center text-muted-foreground"
-            >
+            <td colspan="9" class="px-6 py-8 text-center text-muted-foreground">
               {{ $t("no_content") }}
             </td>
           </tr>
@@ -369,7 +366,6 @@
     </div>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import {
@@ -551,7 +547,6 @@ const loadCounts = async () => {
     countsLoading.value = false;
   }
 };
-
 
 const navigateToGenre = (genre: Genre) => {
   router.push({

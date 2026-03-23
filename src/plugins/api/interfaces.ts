@@ -724,7 +724,6 @@ export interface Genre extends MediaItem {
   genre_aliases: string[] | null;
 }
 
-
 export interface BrowseFolder extends MediaItem {
   path?: string;
   image?: MediaItemImage;
