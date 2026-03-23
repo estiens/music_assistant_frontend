@@ -117,13 +117,13 @@ const syncPlayers = computed(() => {
     // for universal groups, show all available non-group players, regardless of provider
     return Object.values(api.players)
       .filter((x) => x.available && x.type != PlayerType.GROUP)
-      .sort((a, b) => (a.name.toUpperCase() > b.name?.toUpperCase() ? 1 : -1));
+      .sort((a, b) => (a.name ?? '').toUpperCase().localeCompare((b.name ?? '').toUpperCase()));
   }
   if (props.provider === "sync_group") {
     // for sync groups, show all available non-group players that are sync compatible
     return Object.values(api.players)
       .filter((x) => {
-        if (!x.available || x.type == PlayerType.GROUP) return false;
+        if (!x.available || x.type === PlayerType.GROUP) return false;
         if (!x.supported_features.includes(PlayerFeature.SET_MEMBERS))
           return false;
         // If a player is temporarily synced, can_group_with will be empty.
@@ -137,11 +137,11 @@ const syncPlayers = computed(() => {
           canGroupWith = api.players[x.synced_to].can_group_with;
         }
         if (canGroupWith.length === 0) return false;
-        if (members.value.length == 0) return true;
+        if (members.value.length === 0) return true;
         if (members.value.includes(x.player_id)) return true;
         return members.value.some((m) => canGroupWith.includes(m));
       })
-      .sort((a, b) => (a.name.toUpperCase() > b.name?.toUpperCase() ? 1 : -1));
+      .sort((a, b) => (a.name ?? '').toUpperCase().localeCompare((b.name ?? '').toUpperCase()));
   }
   return Object.values(api.players)
     .filter(
@@ -150,7 +150,7 @@ const syncPlayers = computed(() => {
         x.type != PlayerType.GROUP &&
         x.provider == providerDetails.value?.instance_id,
     )
-    .sort((a, b) => (a.name.toUpperCase() > b.name?.toUpperCase() ? 1 : -1));
+    .sort((a, b) => (a.name ?? '').toUpperCase().localeCompare((b.name ?? '').toUpperCase()));
 });
 
 // methods
