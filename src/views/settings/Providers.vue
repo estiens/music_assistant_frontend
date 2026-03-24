@@ -655,11 +655,11 @@ const getAllFilteredProviders = function () {
 }
 
 .providers-list :deep(.v-list-item__prepend) {
-  margin-right: 4px;
+  padding-inline-end: 6px;
 }
 
 .providers-list :deep(.v-list-item__content > div) {
-  padding-left: 4px;
+  padding-left: 0;
 }
 
 .provider-name-title {

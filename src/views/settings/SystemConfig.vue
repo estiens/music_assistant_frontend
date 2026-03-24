@@ -260,12 +260,16 @@ onMounted(async () => {
   background-color: rgba(var(--v-theme-on-surface), 0.05);
 }
 
+.settings-list-item :deep(.v-list-item__prepend) {
+  padding-inline-end: 6px;
+}
+
 .settings-list-item :deep(.v-list-item__prepend .v-icon) {
   margin-inline-end: 0 !important;
 }
 
 .settings-list-item :deep(.v-list-item__content > div) {
-  padding-left: 4px;
+  padding-left: 0;
 }
 
 .settings-list-item :deep(.v-list-item-title) {
@@ -291,8 +295,8 @@ onMounted(async () => {
 }
 
 .setting-list-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
   display: flex;
   align-items: center;
