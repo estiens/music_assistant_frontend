@@ -147,9 +147,10 @@ const navigateToLibraryByGenre = (genre: Genre, mediaType: string) => {
 const excludeGenre = async (itemId: string) => {
   pendingId.value = itemId;
   try {
+    const genre = allGenres.value.find((g) => g.item_id === itemId);
     await api.removeGenreFromLibrary(itemId);
     allGenres.value = allGenres.value.filter((g) => g.item_id !== itemId);
-    globalExclusions.value = await api.getGlobalGenreExclusions();
+    if (genre) globalExclusions.value = [...globalExclusions.value, genre];
     scheduleGenreScan();
   } finally {
     pendingId.value = null;
