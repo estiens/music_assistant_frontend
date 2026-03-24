@@ -1169,6 +1169,8 @@ const restoreSettings = async function () {
     viewMode.value = "panel";
   } else if (props.itemtype == "albums") {
     viewMode.value = "panel";
+  } else if (props.itemtype == "genres") {
+    viewMode.value = "panel_compact";
   } else {
     viewMode.value = "list";
   }
