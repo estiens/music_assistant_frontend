@@ -1465,6 +1465,10 @@ watchEffect(() => {
   // Keep color between text and sliders consistent.
   // Also, this text color has a better contrast than the automatically selected one
   document.documentElement.style.setProperty("--text-color", textColor.hex());
+  document.documentElement.style.setProperty(
+    "--text-color-inverse",
+    isLight ? DARK_TEXT_COLOR.hex() : LIGHT_TEXT_COLOR.hex(),
+  );
   sliderColor.value = textColor.hex();
   const topColor = bgColor.lighten(0.25);
   const bottomColor = bgColor.darken(0.25);
@@ -1678,6 +1682,27 @@ watchEffect(() => {
 div,
 button {
   color: var(--text-color);
+}
+
+.play-btn-wrapper :deep(.play-btn-icon) {
+  background-color: var(--text-color) !important;
+  color: var(--text-color-inverse) !important;
+}
+
+.player-bottom :deep([data-slot="slider-range"]) {
+  background-color: var(--text-color) !important;
+}
+
+.player-bottom :deep([data-slot="slider-thumb"])::before {
+  background-color: var(--text-color) !important;
+}
+
+.player-bottom :deep([data-slot="slider-track"])::before {
+  background-color: color-mix(
+    in srgb,
+    var(--text-color) 24%,
+    transparent
+  ) !important;
 }
 
 .lyrics-wrapper {
