@@ -1715,12 +1715,8 @@ button {
 
 .lyrics-wrapper {
   height: 100%;
-  width: calc(100% + 25px);
-  margin-left: -15px;
-  margin-right: -10px;
+  width: 100%;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
 }
 
 .lyrics-wrapper :deep(.lyrics-line),
