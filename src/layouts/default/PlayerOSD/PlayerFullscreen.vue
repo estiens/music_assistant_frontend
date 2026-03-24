@@ -1719,6 +1719,14 @@ button {
   overflow: hidden;
 }
 
+.lyrics-wrapper :deep(.lyrics-line) {
+  font-size: clamp(1rem, 2vw, 1.6rem);
+}
+
+.lyrics-wrapper :deep(.break-note) {
+  font-size: clamp(1rem, 2vw, 1.6rem);
+}
+
 .title-row {
   display: flex;
   align-items: center;
