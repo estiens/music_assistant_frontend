@@ -1028,8 +1028,8 @@ const documentationUrl = computed(() => {
 }
 
 .setting-list-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -1039,7 +1039,7 @@ const documentationUrl = computed(() => {
 }
 
 .settings-list-item :deep(.v-list-item__prepend) {
-  margin-right: 4px;
+  padding-inline-end: 6px;
 }
 
 .settings-list-item :deep(.v-list-item__prepend .v-icon) {
@@ -1047,7 +1047,7 @@ const documentationUrl = computed(() => {
 }
 
 .settings-list-item :deep(.v-list-item__content > div) {
-  padding-left: 4px;
+  padding-left: 0;
 }
 
 .settings-list-item :deep(.v-list-item-title) {
@@ -1105,12 +1105,6 @@ const documentationUrl = computed(() => {
     min-height: 72px;
   }
 
-  .setting-list-icon {
-    width: 40px;
-    height: 40px;
-    margin-right: 12px;
-  }
-
   .settings-list-item :deep(.v-list-item-title) {
     font-size: 1rem;
   }
@@ -1137,12 +1131,6 @@ const documentationUrl = computed(() => {
   .settings-list-item {
     padding: 16px;
     min-height: 72px;
-  }
-
-  .setting-list-icon {
-    width: 40px;
-    height: 40px;
-    margin-right: 12px;
   }
 
   .settings-list-item :deep(.v-list-item-title) {
