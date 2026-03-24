@@ -5,7 +5,7 @@
 -->
 <template>
   <Sheet v-model:open="show">
-    <SheetContent side="bottom" class="h-[55vh] flex flex-col p-0">
+    <SheetContent side="bottom" class="h-[85vh] flex flex-col p-0">
       <SheetHeader class="flex-row items-center gap-3 border-b px-4 py-3">
         <ListPlus class="size-5 shrink-0 opacity-80" />
         <SheetTitle>{{ $t("add_playlist") }}</SheetTitle>
