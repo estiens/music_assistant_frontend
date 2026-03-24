@@ -10,6 +10,7 @@ import {
   type Album,
   type Artist,
   type AuthToken,
+  type BackgroundTask,
   type CommandMessage,
   type ErrorResultMessage,
   type EventMessage,
@@ -25,7 +26,6 @@ import {
   type Radio,
   type ServerInfoMessage,
   type SuccessResultMessage,
-  type BackgroundTask,
   type TaskSchedule,
   type Track,
   type User,
@@ -549,6 +549,12 @@ export class MusicAssistantApi {
     return this.sendCommand("music/genres/count", { favorite_only });
   }
 
+  public getGenreMediaCounts(
+    genre_ids: string[],
+  ): Promise<Record<string, Record<string, number>>> {
+    return this.sendCommand("music/genres/media_counts", { genre_ids });
+  }
+
   /**
    * Get Artists listing from the server.
    * @param favorite - Filter by favorite status
@@ -925,27 +931,19 @@ export class MusicAssistantApi {
    * @returns Promise resolving to array of genres
    */
   public getLibraryGenres(
-    favorite?: boolean,
-    search?: string,
-    limit?: number,
-    offset?: number,
-    order_by?: string,
-    provider?: string | string[],
-    genre?: number | number[],
-    hide_empty?: boolean | null,
-    media_type?: MediaType,
+    opts: {
+      favorite?: boolean;
+      search?: string;
+      limit?: number;
+      offset?: number;
+      order_by?: string;
+      provider?: string | string[];
+      genre?: number | number[];
+      hide_empty?: boolean | null;
+      media_type?: MediaType;
+    } = {},
   ): Promise<Genre[]> {
-    return this.sendCommand("music/genres/library_items", {
-      favorite,
-      search,
-      limit,
-      offset,
-      order_by,
-      provider,
-      genre,
-      hide_empty,
-      media_type,
-    });
+    return this.sendCommand("music/genres/library_items", opts);
   }
 
   public getGenre(
@@ -971,6 +969,16 @@ export class MusicAssistantApi {
   public removeGenreFromLibrary(item_id: string): Promise<void> {
     return this.sendCommand("music/genres/remove", {
       item_id,
+    });
+  }
+
+  public getGlobalGenreExclusions(): Promise<Genre[]> {
+    return this.sendCommand("music/genres/global_exclusions");
+  }
+
+  public removeGlobalGenreExclusion(genre_id: string): Promise<Genre> {
+    return this.sendCommand("music/genres/remove_global_exclusion", {
+      genre_id,
     });
   }
 
