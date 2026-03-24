@@ -4,6 +4,7 @@
       <div class="flex size-8 items-center justify-center">
         <img
           v-if="thumbSrc"
+          :alt="getGenreDisplayName(genre.name, genre.translation_key, t, te)"
           :src="thumbSrc"
           class="size-8 rounded object-cover"
         />
