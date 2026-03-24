@@ -76,6 +76,10 @@ const activeGenreRows = computed<GenreRow[]>(() =>
       allMediaCounts.value === null
         ? null
         : (allMediaCounts.value[genre.item_id]?.artist ?? 0),
+    playlistCount:
+      allMediaCounts.value === null
+        ? null
+        : (allMediaCounts.value[genre.item_id]?.playlist ?? 0),
     podcastCount:
       allMediaCounts.value === null
         ? null

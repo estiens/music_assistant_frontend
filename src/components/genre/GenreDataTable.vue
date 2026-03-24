@@ -8,6 +8,7 @@ export interface GenreRow {
   trackCount: number | null;
   albumCount: number | null;
   artistCount: number | null;
+  playlistCount: number | null;
   podcastCount: number | null;
   audiobookCount: number | null;
 }
@@ -22,6 +23,7 @@ export interface ExcludedGenreRow {
 
 <script setup lang="ts">
 import type {
+  Column,
   ColumnDef,
   ColumnFiltersState,
   SortingState,
@@ -36,29 +38,22 @@ import {
   useVueTable,
 } from "@tanstack/vue-table";
 import {
-  ArrowUpDown,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Columns3,
   RefreshCw,
   Search,
 } from "lucide-vue-next";
 import { h, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
+import DataTableColumnHeader from "@/components/DataTableColumnHeader.vue";
+import DataTableViewOptions from "@/components/DataTableViewOptions.vue";
 import GenreIcon from "@/components/icons/GenreIcon.vue";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -122,7 +117,13 @@ function formatCount(val: number | null): string {
   return val.toLocaleString();
 }
 
-type MediaType = "track" | "album" | "artist" | "podcast" | "audiobook";
+type MediaType =
+  | "track"
+  | "album"
+  | "artist"
+  | "playlist"
+  | "podcast"
+  | "audiobook";
 type CountKey = `${MediaType}Count`;
 
 const mediaTypeDefs: Array<{
@@ -133,6 +134,7 @@ const mediaTypeDefs: Array<{
   { key: "track", countKey: "trackCount", id: "tracks" },
   { key: "album", countKey: "albumCount", id: "albums" },
   { key: "artist", countKey: "artistCount", id: "artists" },
+  { key: "playlist", countKey: "playlistCount", id: "playlists" },
   { key: "podcast", countKey: "podcastCount", id: "podcasts" },
   { key: "audiobook", countKey: "audiobookCount", id: "audiobooks" },
 ];
@@ -163,18 +165,10 @@ const columns: ColumnDef<GenreRow>[] = [
     id: "genre",
     accessorKey: "displayName",
     header: ({ column }) =>
-      h(
-        Button,
-        {
-          variant: "ghost",
-          class: "-ml-4",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => [
-          toSentenceCase(t("genre_name")),
-          h(ArrowUpDown, { class: "ml-2 size-4" }),
-        ],
-      ),
+      h(DataTableColumnHeader, {
+        column: column as Column<any, unknown>,
+        title: toSentenceCase(t("genre_name")),
+      }),
     cell: ({ row }) => {
       const r = row.original;
       return h(
@@ -210,18 +204,10 @@ const columns: ColumnDef<GenreRow>[] = [
     id: "aliases",
     accessorKey: "aliasCount",
     header: ({ column }) =>
-      h(
-        Button,
-        {
-          variant: "ghost",
-          class: "-ml-4",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => [
-          toSentenceCase(t("aliases")),
-          h(ArrowUpDown, { class: "ml-2 size-4" }),
-        ],
-      ),
+      h(DataTableColumnHeader, {
+        column: column as Column<any, unknown>,
+        title: toSentenceCase(t("aliases")),
+      }),
     cell: ({ row }) =>
       h(
         Badge,
@@ -234,27 +220,16 @@ const columns: ColumnDef<GenreRow>[] = [
       id,
       accessorKey: countKey,
       header: ({ column }) =>
-        h("div", { class: "flex justify-end" }, [
-          h(
-            Button,
-            {
-              variant: "ghost",
-              class: "-mr-4",
-              onClick: () =>
-                column.toggleSorting(column.getIsSorted() === "asc"),
-            },
-            () => [
-              toSentenceCase(t(`${key}s`)),
-              h(ArrowUpDown, { class: "ml-2 size-4" }),
-            ],
-          ),
-        ]),
+        h(DataTableColumnHeader, {
+          column: column as Column<any, unknown>,
+          title: toSentenceCase(t(`${key}s`)),
+        }),
       cell: ({ row }) =>
         h(
           "div",
           {
             class:
-              "cursor-pointer text-right tabular-nums text-muted-foreground hover:text-foreground",
+              "cursor-pointer tabular-nums text-muted-foreground hover:text-foreground",
             onClick: () => emit("navigate-library", row.original.genre, key),
           },
           formatCount(row.original[countKey]),
@@ -356,36 +331,7 @@ const table = useVueTable({
             </SelectItem>
           </SelectContent>
         </Select>
-        <DropdownMenu>
-          <DropdownMenuTrigger as-child>
-            <Button variant="outline" size="sm">
-              <Columns3 />
-              <span class="hidden lg:inline">Columns</span>
-              <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" class="w-56">
-            <template
-              v-for="column in table
-                .getAllColumns()
-                .filter(
-                  (col) =>
-                    typeof col.accessorFn !== 'undefined' && col.getCanHide(),
-                )"
-              :key="column.id"
-            >
-              <DropdownMenuCheckboxItem
-                class="capitalize"
-                :model-value="column.getIsVisible()"
-                @update:model-value="
-                  (value) => column.toggleVisibility(!!value)
-                "
-              >
-                {{ column.id }}
-              </DropdownMenuCheckboxItem>
-            </template>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <DataTableViewOptions :table="table" />
       </div>
     </div>
 
@@ -397,8 +343,8 @@ const table = useVueTable({
         >
           <Spinner class="size-5" />
         </div>
-        <Table class="border-collapse">
-          <TableHeader class="bg-muted sticky top-0 z-10">
+        <Table class="border-separate border-spacing-0">
+          <TableHeader class="bg-muted">
             <TableRow
               v-for="headerGroup in table.getHeaderGroups()"
               :key="headerGroup.id"
@@ -407,6 +353,7 @@ const table = useVueTable({
                 v-for="header in headerGroup.headers"
                 :key="header.id"
                 :col-span="header.colSpan"
+                :class="header.id === 'genre' ? 'pl-6' : ''"
               >
                 <FlexRender
                   v-if="!header.isPlaceholder"
@@ -423,7 +370,11 @@ const table = useVueTable({
                 :key="row.id"
                 :data-state="row.getIsSelected() && 'selected'"
               >
-                <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+                <TableCell
+                  v-for="cell in row.getVisibleCells()"
+                  :key="cell.id"
+                  :class="cell.column.id === 'genre' ? 'pl-4' : ''"
+                >
                   <FlexRender
                     :render="cell.column.columnDef.cell"
                     :props="cell.getContext()"
