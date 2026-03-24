@@ -1715,16 +1715,33 @@ button {
 
 .lyrics-wrapper {
   height: 100%;
-  width: 100%;
+  width: calc(100% + 25px);
+  margin-left: -15px;
+  margin-right: -10px;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
 }
 
-.lyrics-wrapper :deep(.lyrics-line) {
-  font-size: clamp(1rem, 2vw, 1.6rem);
-}
-
+.lyrics-wrapper :deep(.lyrics-line),
 .lyrics-wrapper :deep(.break-note) {
-  font-size: clamp(1rem, 2vw, 1.6rem);
+  font-size: clamp(1.3rem, 4.5vw, 1.9rem);
+}
+
+/* Tablet */
+@media (min-width: 600px) {
+  .lyrics-wrapper :deep(.lyrics-line),
+  .lyrics-wrapper :deep(.break-note) {
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  }
+}
+
+/* Desktop */
+@media (min-width: 1280px) {
+  .lyrics-wrapper :deep(.lyrics-line),
+  .lyrics-wrapper :deep(.break-note) {
+    font-size: clamp(1.4rem, 2vw, 2.2rem);
+  }
 }
 
 .title-row {
