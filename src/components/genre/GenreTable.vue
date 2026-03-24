@@ -174,6 +174,7 @@ const restoreGenre = async (exclusion: Genre) => {
 };
 
 let tableReloadTimer: ReturnType<typeof setTimeout> | null = null;
+let unsub: (() => void) | null = null;
 
 const scheduleTableReload = () => {
   if (tableReloadTimer) clearTimeout(tableReloadTimer);
@@ -185,7 +186,7 @@ const scheduleTableReload = () => {
 };
 
 onMounted(() => {
-  const unsub = api.subscribe_multi(
+  unsub = api.subscribe_multi(
     [
       EventType.MEDIA_ITEM_ADDED,
       EventType.MEDIA_ITEM_UPDATED,
@@ -195,10 +196,11 @@ onMounted(() => {
       if (evt.object_id?.startsWith("library://genre")) scheduleTableReload();
     },
   );
-  onBeforeUnmount(() => {
-    if (tableReloadTimer) clearTimeout(tableReloadTimer);
-    unsub();
-  });
+});
+
+onBeforeUnmount(() => {
+  if (tableReloadTimer) clearTimeout(tableReloadTimer);
+  unsub?.();
 });
 
 watch(filter, loadData);

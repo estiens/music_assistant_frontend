@@ -77,7 +77,10 @@ const loadItems = async function (params: LoadDataParams) {
     limit: params.limit,
     offset: params.offset,
     order_by: params.sortBy,
-    provider: params.provider && params.provider.length > 0 ? params.provider : undefined,
+    provider:
+      params.provider && params.provider.length > 0
+        ? params.provider
+        : undefined,
     genre: params.genreIds,
     hide_empty: params.hideEmptyFilter,
   });
