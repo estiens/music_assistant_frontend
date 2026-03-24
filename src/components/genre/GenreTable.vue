@@ -107,16 +107,7 @@ const loadData = async () => {
           ? null
           : false;
     [allGenres.value, globalExclusions.value] = await Promise.all([
-      api.getLibraryGenres(
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        hideEmpty,
-      ),
+      api.getLibraryGenres({ hide_empty: hideEmpty }),
       api.getGlobalGenreExclusions(),
     ]);
   } finally {

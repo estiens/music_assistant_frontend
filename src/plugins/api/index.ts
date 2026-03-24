@@ -10,6 +10,7 @@ import {
   type Album,
   type Artist,
   type AuthToken,
+  type BackgroundTask,
   type CommandMessage,
   type ErrorResultMessage,
   type EventMessage,
@@ -25,7 +26,6 @@ import {
   type Radio,
   type ServerInfoMessage,
   type SuccessResultMessage,
-  type BackgroundTask,
   type TaskSchedule,
   type Track,
   type User,
@@ -931,27 +931,19 @@ export class MusicAssistantApi {
    * @returns Promise resolving to array of genres
    */
   public getLibraryGenres(
-    favorite?: boolean,
-    search?: string,
-    limit?: number,
-    offset?: number,
-    order_by?: string,
-    provider?: string | string[],
-    genre?: number | number[],
-    hide_empty?: boolean | null,
-    media_type?: MediaType,
+    opts: {
+      favorite?: boolean;
+      search?: string;
+      limit?: number;
+      offset?: number;
+      order_by?: string;
+      provider?: string | string[];
+      genre?: number | number[];
+      hide_empty?: boolean | null;
+      media_type?: MediaType;
+    } = {},
   ): Promise<Genre[]> {
-    return this.sendCommand("music/genres/library_items", {
-      favorite,
-      search,
-      limit,
-      offset,
-      order_by,
-      provider,
-      genre,
-      hide_empty,
-      media_type,
-    });
+    return this.sendCommand("music/genres/library_items", opts);
   }
 
   public getGenre(
