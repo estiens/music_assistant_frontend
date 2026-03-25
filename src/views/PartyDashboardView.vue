@@ -424,10 +424,16 @@ const onFullscreenChange = () => {
     store.frameless = false;
   }
 };
-document.addEventListener("fullscreenchange", onFullscreenChange);
-onBeforeUnmount(() =>
-  document.removeEventListener("fullscreenchange", onFullscreenChange),
-);
+onMounted(() => {
+  if (typeof document !== "undefined") {
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+  }
+});
+onBeforeUnmount(() => {
+  if (typeof document !== "undefined") {
+    document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }
+});
 
 // Compact mode: hide previous tracks on small screens to reclaim space
 const compactQuery = window.matchMedia("(max-width: 768px)");
