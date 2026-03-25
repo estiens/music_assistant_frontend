@@ -17,7 +17,13 @@
           </div>
         </Transition>
       </div>
-      <img :src="logoSrc" class="qr-logo" alt="Music Assistant" />
+      <p
+        v-if="qrText"
+        :style="{ width: qrSize + 'px', textAlign: 'center' }"
+        class=""
+      >
+        {{ qrText }}
+      </p>
     </div>
     <div v-else class="qr-error">
       <AlertCircle :size="64" />
@@ -29,16 +35,22 @@
 
 <script setup lang="ts">
 import { Spinner } from "@/components/ui/spinner";
+import { usePartyConfig } from "@/composables/usePartyConfig";
 import { copyToClipboard } from "@/helpers/utils";
 import api from "@/plugins/api";
 import { EventType } from "@/plugins/api/interfaces";
 import { $t } from "@/plugins/i18n";
 import { AlertCircle, Check } from "lucide-vue-next";
 import QRCode from "qrcode";
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 const emit = defineEmits<{ available: [value: boolean] }>();
-const logoSrc = new URL("@/assets/logo/logo.svg", import.meta.url).href;
+
+const { config: partyConfig } = usePartyConfig();
+
+const qrText = computed(
+  () => partyConfig.value?.qr_text ?? "Scan the QR code to join the party!",
+);
 
 const qrCanvas = ref<HTMLCanvasElement | null>(null);
 const qrContainer = ref<HTMLElement | null>(null);
@@ -200,14 +212,6 @@ onBeforeUnmount(() => {
   transition:
     transform 0.2s ease,
     opacity 0.2s ease;
-}
-
-.qr-logo {
-  width: calc(var(--qr-size) * 0.8);
-  height: auto;
-  margin-top: 0.8rem;
-  margin-bottom: 0.2rem;
-  opacity: 0.85;
 }
 
 .qr-link:hover {

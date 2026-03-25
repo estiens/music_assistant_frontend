@@ -29,6 +29,60 @@
         },
       ]"
     >
+      <!-- Top-right controls -->
+      <div class="absolute top-3 right-3 flex items-center gap-2 z-10">
+        <!-- Fullscreen: minimize button -->
+        <Button
+          v-if="isFullscreen && !hideBackButton"
+          variant="ghost-icon"
+          size="icon-sm"
+          @click="goFullscreen(false)"
+        >
+          <Minimize2 :size="13" />
+        </Button>
+
+        <!-- Non-fullscreen: player name + actions -->
+        <template v-if="!isFullscreen">
+          <span
+            v-if="store.activePlayer"
+            class="inline-flex items-center gap-[0.4rem] py-[0.3rem] px-3 rounded-full font-medium backdrop-blur-sm text-white whitespace-nowrap select-none"
+            style="
+              font-size: clamp(0.65rem, 1vw, 0.8rem);
+              background: rgba(255, 255, 255, 0.15);
+            "
+          >
+            <Speaker :size="12" />
+            {{ store.activePlayer.name }}
+          </span>
+          <span
+            v-if="!qrAvailable"
+            class="inline-flex items-center gap-[0.4rem] py-[0.3rem] px-3 rounded-full font-medium backdrop-blur-sm whitespace-nowrap select-none"
+            style="
+              font-size: clamp(0.65rem, 1vw, 0.8rem);
+              background: rgba(234, 179, 8, 0.25);
+              color: rgb(253, 224, 71);
+            "
+          >
+            <AlertTriangle :size="12" />
+            {{ $t("providers.party.guest_access_disabled") }}
+          </span>
+          <Button
+            v-if="partyInstanceId"
+            variant="ghost-icon"
+            size="icon-sm"
+            @click="goToSettings"
+          >
+            <Settings :size="13" />
+          </Button>
+          <Button
+            variant="ghost-icon"
+            size="icon-sm"
+            @click="goFullscreen(true)"
+          >
+            <Maximize2 :size="13" />
+          </Button>
+        </template>
+      </div>
       <!-- Karaoke Mode: QR top-left, lyrics center, track stack bottom -->
       <template v-if="karaokeMode">
         <div
@@ -154,6 +208,12 @@
         </div>
       </template>
     </div>
+    <div
+      class="absolute bottom-4 right-4 flex items-center gap-2 opacity-50 text-white font-medium"
+    >
+      <span>{{ $t("providers.party.powered_by") }}</span>
+      <img :src="logoSrc" alt="Music Assistant" class="h-5 w-auto" />
+    </div>
   </div>
 </template>
 
@@ -161,6 +221,7 @@
 import LyricsViewer from "@/components/LyricsViewer.vue";
 import PartyQR from "@/components/party/PartyQR.vue";
 import PartyTrackCard from "@/components/party/PartyTrackCard.vue";
+import Button from "@/components/ui/button/Button.vue";
 import { useLyricsElapsedTime } from "@/composables/useLyricsElapsedTime";
 import { usePartyConfig } from "@/composables/usePartyConfig";
 import {
@@ -179,12 +240,22 @@ import {
 } from "@/plugins/api/interfaces";
 import { store } from "@/plugins/store";
 import Color from "color";
-import { Music, Speaker } from "lucide-vue-next";
+import {
+  AlertTriangle,
+  Maximize2,
+  Minimize2,
+  Music,
+  Settings,
+  Speaker,
+} from "lucide-vue-next";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 const theme = useTheme();
+const router = useRouter();
 const { config: partyConfig, fetchConfig } = usePartyConfig();
+const logoSrc = new URL("@/assets/logo/logo.svg", import.meta.url).href;
 
 const refreshPartyPlayer = async () => {
   const partyPlayerId = await api.sendCommand<string | null>("party/player");
@@ -208,6 +279,29 @@ const accessError = ref("");
 // Badge colors (hex values from config)
 const requestBadgeColor = ref("");
 const boostBadgeColor = ref("");
+const isFullscreen = computed(() => store.frameless);
+
+const partyName = computed(() => partyConfig.value?.party_name ?? null);
+const hideBackButton = computed(
+  () => partyConfig.value?.hide_back_button ?? false,
+);
+const partyInstanceId = computed(
+  () =>
+    Object.values(api.providers).find((p) => p.domain === "party")?.instance_id,
+);
+
+const goToSettings = () => {
+  if (partyInstanceId.value) {
+    router.push({
+      name: "editprovider",
+      params: { instanceId: partyInstanceId.value },
+    });
+  }
+};
+
+const goFullscreen = (frameless: boolean) => {
+  store.frameless = frameless;
+};
 
 // Compact mode: hide previous tracks on small screens to reclaim space
 const compactQuery = window.matchMedia("(max-width: 768px)");
