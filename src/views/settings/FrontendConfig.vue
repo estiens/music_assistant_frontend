@@ -278,6 +278,7 @@ const onSubmit = function (values: Record<string, ConfigValueType>) {
 const onAction = async function (
   _action: string,
   _values: Record<string, ConfigValueType>,
+  _immediateApply: boolean,
 ) {};
 
 const onImmediateApply = function (values: Record<string, ConfigValueType>) {
