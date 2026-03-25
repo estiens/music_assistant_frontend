@@ -4,19 +4,22 @@
   we steer its visibility through the centralized eventbus.
 -->
 <template>
-  <Dialog v-model:open="showDialog">
+  <Dialog :key="dialogKey" v-model:open="showDialog">
     <DialogContent class="sm:max-w-[500px]">
       <DialogHeader>
         <DialogTitle class="mb-2">
           {{ $t(queueId ? "save_queue_as_playlist" : "new_playlist") }}
         </DialogTitle>
-        <DialogDescription v-if="!queueId">
+        <DialogDescription v-if="queueId" class="sr-only">
+          {{ $t("save_queue_as_playlist") }}
+        </DialogDescription>
+        <DialogDescription v-else>
           {{ $t("playlist_create_media_types", [providerName]) }}
           {{ playlistAllowedMediaTypesTranslated.join(", ") }}
         </DialogDescription>
 
-        <div class="flex flex-col gap-4 mb-3">
-          <DialogDescription v-if="!queueId && playlistAllowMixedMediaTypes">
+        <div v-if="!queueId" class="flex flex-col gap-4 mb-3">
+          <DialogDescription v-if="playlistAllowMixedMediaTypes">
             {{ $t("playlist_mix_allowed") }}
           </DialogDescription>
           <div
@@ -43,7 +46,9 @@
               </div>
             </RadioGroup>
           </div>
+        </div>
 
+        <div class="flex flex-col gap-4 mb-3">
           <div class="flex flex-col gap-2 mt-3">
             <Label for="playlist-name">{{ $t("new_playlist_name") }}</Label>
             <Input
@@ -91,6 +96,9 @@ import router from "@/plugins/router";
 import { store } from "@/plugins/store";
 
 const showDialog = ref(false);
+// force Dialog remount via dynamic key to prevent the enter animation from
+// stalling at opacity:0 when opened from a context menu
+const dialogKey = ref(0);
 const playlistName = ref("");
 const playlistAllowedMediaTypes = ref<MediaType[]>([]);
 const playlistAllowedMediaTypesTranslated = ref<string[]>([]);
@@ -119,6 +127,9 @@ onMounted(() => {
     playlistSelectedMediaType.value = MediaType.UNKNOWN;
 
     if (!queueId.value) {
+      // Provider feature detection is only needed for the "new playlist" flow.
+      // The queue-to-playlist flow uses a different backend endpoint that
+      // handles provider selection internally.
       const provider = api.getProvider(providerId.value);
 
       if (provider != undefined) {
@@ -167,13 +178,13 @@ onMounted(() => {
         }
       } else {
         toast.error($t("playlist_create_provider_error"));
+        return;
       }
+      playlistAllowedMediaTypesTranslated.value =
+        getTranslatedSupportedMediaTypes();
     }
-    playlistAllowedMediaTypesTranslated.value =
-      getTranslatedSupportedMediaTypes();
-    nextTick(() => {
-      showDialog.value = true;
-    });
+    dialogKey.value++;
+    showDialog.value = true;
   });
 });
 
