@@ -107,7 +107,6 @@ describe("useRateLimiting", () => {
       boost_refill_minutes: 10,
       skip_song_limit: 2,
       skip_song_refill_minutes: 30,
-      display_lyrics: false,
       karaoke_mode: false,
       highlight_ahead: true,
       request_badge_color: "#000000",

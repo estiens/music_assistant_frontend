@@ -296,7 +296,7 @@ const refreshPartyPlayer = async () => {
 };
 
 const qrAvailable = ref(true); // Optimistic default; PartyQR emits false if guest access disabled
-const displayLyrics = ref(false); // Whether karaoke lyrics are shown
+const displayLyrics = computed(() => karaokeMode.value); // Lyrics shown whenever karaoke mode is on
 const karaokeMode = ref(false); // Whether karaoke mode layout is active
 const highlightAhead = ref(true); // Whether lyric highlight finishes at LRC time
 const antiBurnIn = ref(false); // Swap QR/track sides periodically
@@ -419,7 +419,7 @@ const fetchLyrics = async () => {
   }
 };
 
-const lyricsEnabled = computed(() => displayLyrics.value || karaokeMode.value);
+const lyricsEnabled = computed(() => karaokeMode.value);
 const lyricsTextColor = computed(() =>
   albumArtUrl.value
     ? "#FFFFFF"
@@ -724,11 +724,8 @@ onMounted(async () => {
   // Fetch party configuration via shared composable
   const config = await fetchConfig();
   if (config) {
-    if (config.display_lyrics !== undefined) {
-      displayLyrics.value = config.display_lyrics;
-    }
     if (config.karaoke_mode !== undefined) {
-      karaokeMode.value = config.display_lyrics && config.karaoke_mode;
+      karaokeMode.value = config.karaoke_mode;
     }
     if (config.highlight_ahead !== undefined) {
       highlightAhead.value = config.highlight_ahead;
@@ -791,15 +788,12 @@ onBeforeUnmount(() => {
 // React to party config changes (e.g., admin toggles player controls)
 watch(partyConfig, (newConfig) => {
   if (newConfig) {
-    displayLyrics.value = newConfig.display_lyrics ?? false;
-    karaokeMode.value =
-      (newConfig.display_lyrics ?? false) && (newConfig.karaoke_mode ?? false);
+    karaokeMode.value = newConfig.karaoke_mode ?? false;
     highlightAhead.value = newConfig.highlight_ahead ?? true;
     requestBadgeColor.value = newConfig.request_badge_color ?? "#2196F3";
     boostBadgeColor.value = newConfig.boost_badge_color ?? "#FF5722";
     antiBurnIn.value = newConfig.anti_burn_in ?? false;
   } else {
-    displayLyrics.value = false;
     karaokeMode.value = false;
     highlightAhead.value = true;
     requestBadgeColor.value = "#2196F3";
