@@ -335,7 +335,23 @@ const goToSettings = () => {
 
 const goFullscreen = (frameless: boolean) => {
   store.frameless = frameless;
+  if (frameless) {
+    document.documentElement.requestFullscreen?.();
+  } else if (document.fullscreenElement) {
+    document.exitFullscreen?.();
+  }
 };
+
+// Sync frameless state when user exits browser fullscreen via Escape
+const onFullscreenChange = () => {
+  if (!document.fullscreenElement && store.frameless) {
+    store.frameless = false;
+  }
+};
+document.addEventListener("fullscreenchange", onFullscreenChange);
+onBeforeUnmount(() =>
+  document.removeEventListener("fullscreenchange", onFullscreenChange),
+);
 
 // Compact mode: hide previous tracks on small screens to reclaim space
 const compactQuery = window.matchMedia("(max-width: 768px)");
