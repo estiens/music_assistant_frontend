@@ -36,7 +36,8 @@
       >
         <!-- Left: party name -->
         <span
-          class="font-semibold text-white whitespace-nowrap select-none"
+          class="font-semibold whitespace-nowrap select-none"
+          :style="{ color: chromeTextColor }"
           style="font-size: clamp(0.9rem, 2vw, 2rem)"
         >
           {{ partyName }}
@@ -58,11 +59,12 @@
           <template v-if="!isFullscreen">
             <span
               v-if="store.activePlayer"
-              class="inline-flex items-center gap-[0.4rem] py-[0.3rem] px-3 rounded-full font-medium backdrop-blur-sm text-white whitespace-nowrap select-none"
-              style="
-                font-size: clamp(0.65rem, 1vw, 0.8rem);
-                background: rgba(255, 255, 255, 0.15);
-              "
+              class="inline-flex items-center gap-[0.4rem] py-[0.3rem] px-3 rounded-full font-medium backdrop-blur-sm whitespace-nowrap select-none"
+              :style="{
+                fontSize: 'clamp(0.65rem, 1vw, 0.8rem)',
+                background: chromePillBackground,
+                color: chromeTextColor,
+              }"
             >
               <Speaker :size="12" />
               {{ store.activePlayer.name }}
@@ -104,7 +106,7 @@
           class="karaoke-qr"
           :style="swapped ? { left: 'auto', right: '2vw' } : undefined"
         >
-          <PartyQR @available="qrAvailable = $event" />
+          <PartyQR :qr-dark="qrDarkColor" @available="qrAvailable = $event" />
         </div>
 
         <div
@@ -181,7 +183,7 @@
             class="qr-wrapper"
             :style="swapped && displayLyrics ? { order: 1 } : undefined"
           >
-            <PartyQR @available="qrAvailable = $event" />
+            <PartyQR :qr-dark="qrDarkColor" @available="qrAvailable = $event" />
           </div>
           <div
             v-if="displayLyrics"
@@ -243,10 +245,11 @@
       </template>
     </div>
     <div
-      class="absolute bottom-1 right-1 flex items-center gap-2 opacity-50 text-white font-medium"
+      class="absolute bottom-1 right-1 flex items-center gap-2 opacity-50 font-medium"
+      :style="{ color: chromeTextColor }"
     >
       <span>{{ $t("providers.party.powered_by") }}</span>
-      <img :src="logoSrc" alt="Music Assistant" class="h-5 w-auto" />
+      <img :src="maLogoSrc" alt="Music Assistant" class="h-5 w-auto" />
     </div>
   </div>
 </template>
@@ -290,6 +293,8 @@ const theme = useTheme();
 const router = useRouter();
 const { config: partyConfig, fetchConfig } = usePartyConfig();
 const logoSrc = new URL("@/assets/logo/logo.svg", import.meta.url).href;
+const logoDarkSrc = new URL("@/assets/logo/logo-dark.svg", import.meta.url)
+  .href;
 
 const refreshPartyPlayer = async () => {
   const partyPlayerId = await api.sendCommand<string | null>("party/player");
@@ -314,6 +319,21 @@ const accessError = ref("");
 const requestBadgeColor = ref("");
 const boostBadgeColor = ref("");
 const isFullscreen = computed(() => store.frameless);
+const chromeOnAlbumArt = computed(
+  () => useAlbumArtBackground.value && !!albumArtUrl.value,
+);
+const chromeTextColor = computed(() =>
+  chromeOnAlbumArt.value ? "#FFFFFF" : "rgba(var(--v-theme-on-surface), 0.9)",
+);
+const chromePillBackground = computed(() =>
+  chromeOnAlbumArt.value ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.08)",
+);
+const maLogoSrc = computed(() =>
+  chromeOnAlbumArt.value ? logoSrc : logoDarkSrc,
+);
+const qrDarkColor = computed(() =>
+  chromeOnAlbumArt.value ? "#FFFFFF" : "#000000",
+);
 
 const partyName = computed(() => partyConfig.value?.party_name ?? null);
 const hideBackButton = computed(

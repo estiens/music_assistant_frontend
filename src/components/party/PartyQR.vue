@@ -44,6 +44,17 @@ import { AlertCircle, Check } from "lucide-vue-next";
 import QRCode from "qrcode";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
+const props = withDefaults(
+  defineProps<{
+    qrDark?: string;
+    qrLight?: string;
+  }>(),
+  {
+    qrDark: "#FFFFFF",
+    qrLight: "#00000000",
+  },
+);
+
 const emit = defineEmits<{ available: [value: boolean] }>();
 
 const { config: partyConfig } = usePartyConfig();
@@ -89,8 +100,8 @@ const renderQRToCanvas = async () => {
     width: qrSize.value,
     margin: 2,
     color: {
-      dark: "#FFFFFF",
-      light: "#00000000",
+      dark: props.qrDark,
+      light: props.qrLight,
     },
   });
 };
@@ -99,6 +110,14 @@ const renderQRToCanvas = async () => {
 watch(qrCanvas, (canvas) => {
   if (canvas) renderQRToCanvas();
 });
+
+// Re-render when colors change (e.g., empty-state vs album-art mode)
+watch(
+  () => [props.qrDark, props.qrLight],
+  () => {
+    if (qrCanvas.value && qrCodeUrl.value) renderQRToCanvas();
+  },
+);
 
 const generateQRCode = async () => {
   loading.value = true;
