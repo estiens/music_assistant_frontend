@@ -29,6 +29,72 @@
         },
       ]"
     >
+      <!-- Topbar -->
+      <div
+        class="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2"
+        style="background: transparent"
+      >
+        <!-- Left: party name -->
+        <span
+          class="font-semibold select-none truncate min-w-0 mr-3"
+          :style="{
+            color: chromeTextColor,
+            fontSize: 'clamp(0.85rem, 1.5vw, 1.5rem)',
+          }"
+        >
+          {{ partyName }}
+        </span>
+
+        <!-- Right: controls -->
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- Fullscreen: minimize button -->
+          <Button
+            v-if="isFullscreen && !hideBackButton"
+            variant="ghost-icon"
+            size="icon-sm"
+            @click="goFullscreen(false)"
+          >
+            <Minimize2 :size="13" />
+          </Button>
+
+          <!-- Non-fullscreen: actions -->
+          <template v-if="!isFullscreen">
+            <Badge
+              v-if="qrAvailable"
+              variant="warning"
+              class="cursor-pointer"
+              @click="showGuestAccessDialog = true"
+            >
+              <WifiIcon :size="11" />
+              {{ $t("providers.party.guest_access_enabled") }}
+            </Badge>
+            <Badge
+              v-else
+              variant="info"
+              class="cursor-pointer"
+              @click="showGuestAccessDialog = true"
+            >
+              <WifiOff :size="11" />
+              {{ $t("providers.party.guest_access_disabled") }}
+            </Badge>
+            <Button
+              v-if="partyInstanceId"
+              variant="ghost-icon"
+              size="icon-sm"
+              @click="goToSettings"
+            >
+              <Settings :size="13" />
+            </Button>
+            <Button
+              variant="ghost-icon"
+              size="icon-sm"
+              @click="goFullscreen(true)"
+            >
+              <Maximize2 :size="13" />
+            </Button>
+          </template>
+        </div>
+      </div>
       <!-- Karaoke Mode: QR top-left, lyrics center, track stack bottom -->
       <template v-if="karaokeMode">
         <div
@@ -36,10 +102,24 @@
           class="karaoke-qr"
           :style="swapped ? { left: 'auto', right: '2vw' } : undefined"
         >
-          <PartyQR @available="qrAvailable = $event" />
+          <PartyQR :qr-dark="qrDarkColor" @available="qrAvailable = $event" />
         </div>
 
-        <div class="karaoke-lyrics">
+        <div
+          class="karaoke-lyrics"
+          :style="{
+            '--karaoke-pad-left': !qrAvailable
+              ? 'clamp(1rem, 2vw, 2rem)'
+              : swapped
+                ? 'clamp(1rem, 2vw, 2rem)'
+                : 'clamp(6rem, 22vw, 20rem)',
+            '--karaoke-pad-right': !qrAvailable
+              ? 'clamp(1rem, 2vw, 2rem)'
+              : swapped
+                ? 'clamp(6rem, 22vw, 20rem)'
+                : 'clamp(1rem, 2vw, 2rem)',
+          }"
+        >
           <LyricsViewer
             :media-item="store.curQueueItem?.media_item"
             :position="lyricsElapsedTime"
@@ -86,14 +166,20 @@
         <!-- QR Code and Lyrics -->
         <div
           v-show="qrAvailable || displayLyrics"
-          :class="['qr-section', { 'qr-section--with-lyrics': displayLyrics }]"
+          :class="[
+            'qr-section',
+            {
+              'qr-section--with-lyrics': displayLyrics,
+              'qr-section--lyrics-only': displayLyrics && !qrAvailable,
+            },
+          ]"
         >
           <div
             v-show="qrAvailable"
             class="qr-wrapper"
             :style="swapped && displayLyrics ? { order: 1 } : undefined"
           >
-            <PartyQR @available="qrAvailable = $event" />
+            <PartyQR :qr-dark="qrDarkColor" @available="qrAvailable = $event" />
           </div>
           <div
             v-if="displayLyrics"
@@ -154,6 +240,45 @@
         </div>
       </template>
     </div>
+    <div
+      class="absolute bottom-1 right-1 flex items-center gap-2 opacity-50 font-medium"
+      :style="{ color: chromeTextColor }"
+    >
+      <span>{{ $t("providers.party.powered_by") }}</span>
+      <img :src="maLogoSrc" alt="Music Assistant" class="h-5 w-auto" />
+    </div>
+
+    <!-- Guest Access Toggle Dialog -->
+    <AlertDialog v-model:open="showGuestAccessDialog">
+      <AlertDialogContent class="sm:max-w-[480px]">
+        <AlertDialogHeader class="text-left">
+          <AlertDialogTitle>
+            {{
+              qrAvailable
+                ? $t("providers.party.disable_guest_access")
+                : $t("providers.party.enable_guest_access")
+            }}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {{
+              qrAvailable
+                ? $t("providers.party.confirm_disable_guest_access")
+                : $t("providers.party.confirm_enable_guest_access")
+            }}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter class="flex-row justify-end">
+          <AlertDialogCancel class="mt-0">{{ $t("cancel") }}</AlertDialogCancel>
+          <Button :disabled="guestAccessSaving" @click="toggleGuestAccess">
+            {{
+              qrAvailable
+                ? $t("providers.party.disable_guest_access")
+                : $t("providers.party.enable_guest_access")
+            }}
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>
 
@@ -161,6 +286,17 @@
 import LyricsViewer from "@/components/LyricsViewer.vue";
 import PartyQR from "@/components/party/PartyQR.vue";
 import PartyTrackCard from "@/components/party/PartyTrackCard.vue";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useLyricsElapsedTime } from "@/composables/useLyricsElapsedTime";
 import { usePartyConfig } from "@/composables/usePartyConfig";
 import {
@@ -179,12 +315,25 @@ import {
 } from "@/plugins/api/interfaces";
 import { store } from "@/plugins/store";
 import Color from "color";
-import { Music, Speaker } from "lucide-vue-next";
+import {
+  Maximize2,
+  Minimize2,
+  Music,
+  Settings,
+  Speaker,
+  WifiIcon,
+  WifiOff,
+} from "lucide-vue-next";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 const theme = useTheme();
+const router = useRouter();
 const { config: partyConfig, fetchConfig } = usePartyConfig();
+const logoSrc = new URL("@/assets/logo/logo.svg", import.meta.url).href;
+const logoDarkSrc = new URL("@/assets/logo/logo-dark.svg", import.meta.url)
+  .href;
 
 const refreshPartyPlayer = async () => {
   const partyPlayerId = await api.sendCommand<string | null>("party/player");
@@ -198,16 +347,93 @@ const refreshPartyPlayer = async () => {
 };
 
 const qrAvailable = ref(true); // Optimistic default; PartyQR emits false if guest access disabled
-const displayLyrics = ref(false); // Whether karaoke lyrics are shown
+const displayLyrics = computed(() => karaokeMode.value); // Lyrics shown whenever karaoke mode is on
 const karaokeMode = ref(false); // Whether karaoke mode layout is active
 const highlightAhead = ref(true); // Whether lyric highlight finishes at LRC time
 const antiBurnIn = ref(false); // Swap QR/track sides periodically
 const swapped = ref(false); // Current swap state for anti burn-in
 let burnInInterval: ReturnType<typeof setInterval> | null = null;
 const accessError = ref("");
+const showGuestAccessDialog = ref(false);
+const guestAccessSaving = ref(false);
+
+const toggleGuestAccess = async () => {
+  if (!partyInstanceId.value) return;
+  guestAccessSaving.value = true;
+  try {
+    await api.saveProviderConfig(
+      "party",
+      { enable_guest_access: !qrAvailable.value },
+      partyInstanceId.value,
+    );
+    showGuestAccessDialog.value = false;
+  } catch (error) {
+    console.error("Failed to toggle guest access:", error);
+  } finally {
+    guestAccessSaving.value = false;
+  }
+};
+
 // Badge colors (hex values from config)
 const requestBadgeColor = ref("");
 const boostBadgeColor = ref("");
+const isFullscreen = computed(() => store.frameless);
+const chromeOnAlbumArt = computed(
+  () => useAlbumArtBackground.value && !!albumArtUrl.value,
+);
+const chromeTextColor = computed(() =>
+  chromeOnAlbumArt.value ? "#FFFFFF" : "rgba(var(--v-theme-on-surface), 0.9)",
+);
+const maLogoSrc = computed(() =>
+  chromeOnAlbumArt.value ? logoSrc : logoDarkSrc,
+);
+const qrDarkColor = computed(() =>
+  chromeOnAlbumArt.value ? "#FFFFFF" : "#000000",
+);
+
+const partyName = computed(() => partyConfig.value?.party_name ?? null);
+const hideBackButton = computed(
+  () => partyConfig.value?.hide_back_button ?? false,
+);
+const partyInstanceId = computed(
+  () =>
+    Object.values(api.providers).find((p) => p.domain === "party")?.instance_id,
+);
+
+const goToSettings = () => {
+  if (partyInstanceId.value) {
+    router.push({
+      name: "editprovider",
+      params: { instanceId: partyInstanceId.value },
+    });
+  }
+};
+
+const goFullscreen = (frameless: boolean) => {
+  store.frameless = frameless;
+  if (frameless) {
+    document.documentElement.requestFullscreen?.();
+  } else if (document.fullscreenElement) {
+    document.exitFullscreen?.();
+  }
+};
+
+// Sync frameless state when user exits browser fullscreen via Escape
+const onFullscreenChange = () => {
+  if (!document.fullscreenElement && store.frameless) {
+    store.frameless = false;
+  }
+};
+onMounted(() => {
+  if (typeof document !== "undefined") {
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+  }
+});
+onBeforeUnmount(() => {
+  if (typeof document !== "undefined") {
+    document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }
+});
 
 // Compact mode: hide previous tracks on small screens to reclaim space
 const compactQuery = window.matchMedia("(max-width: 768px)");
@@ -267,7 +493,7 @@ const fetchLyrics = async () => {
   }
 };
 
-const lyricsEnabled = computed(() => displayLyrics.value || karaokeMode.value);
+const lyricsEnabled = computed(() => karaokeMode.value);
 const lyricsTextColor = computed(() =>
   albumArtUrl.value
     ? "#FFFFFF"
@@ -572,11 +798,8 @@ onMounted(async () => {
   // Fetch party configuration via shared composable
   const config = await fetchConfig();
   if (config) {
-    if (config.display_lyrics !== undefined) {
-      displayLyrics.value = config.display_lyrics;
-    }
     if (config.karaoke_mode !== undefined) {
-      karaokeMode.value = config.display_lyrics && config.karaoke_mode;
+      karaokeMode.value = config.karaoke_mode;
     }
     if (config.highlight_ahead !== undefined) {
       highlightAhead.value = config.highlight_ahead;
@@ -639,15 +862,12 @@ onBeforeUnmount(() => {
 // React to party config changes (e.g., admin toggles player controls)
 watch(partyConfig, (newConfig) => {
   if (newConfig) {
-    displayLyrics.value = newConfig.display_lyrics ?? false;
-    karaokeMode.value =
-      (newConfig.display_lyrics ?? false) && (newConfig.karaoke_mode ?? false);
+    karaokeMode.value = newConfig.karaoke_mode ?? false;
     highlightAhead.value = newConfig.highlight_ahead ?? true;
     requestBadgeColor.value = newConfig.request_badge_color ?? "#2196F3";
     boostBadgeColor.value = newConfig.boost_badge_color ?? "#FF5722";
     antiBurnIn.value = newConfig.anti_burn_in ?? false;
   } else {
-    displayLyrics.value = false;
     karaokeMode.value = false;
     highlightAhead.value = true;
     requestBadgeColor.value = "#2196F3";
@@ -763,6 +983,10 @@ watch(
   max-height: 100%;
 }
 
+.qr-section--lyrics-only {
+  flex: 1 1 100%;
+}
+
 .lyrics-section :deep(.synced-content) {
   padding: 15vh 0;
 }
@@ -841,9 +1065,9 @@ watch(
 
 .karaoke-qr {
   position: absolute;
-  top: 2vw;
+  top: 5vw;
   left: 2vw;
-  z-index: 1;
+  z-index: 6;
   max-width: 20vw;
 }
 
@@ -854,7 +1078,7 @@ watch(
 .karaoke-lyrics {
   flex: 1;
   width: 100%;
-  max-width: 70vw;
+  max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -862,6 +1086,9 @@ watch(
   min-height: 0;
   position: relative;
   z-index: 2;
+  box-sizing: border-box;
+  padding-left: var(--karaoke-pad-left);
+  padding-right: var(--karaoke-pad-right);
 }
 
 .karaoke-lyrics :deep(.synced-content) {
@@ -954,7 +1181,7 @@ watch(
   }
 
   .karaoke-lyrics {
-    max-width: 85vw;
+    max-width: 100%;
   }
 
   .karaoke-track-stack {
@@ -1045,6 +1272,8 @@ watch(
 
   .karaoke-lyrics {
     max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .karaoke-lyrics :deep(.synced-content) {

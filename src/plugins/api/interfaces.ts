@@ -1228,10 +1228,12 @@ export interface PartyConfig {
   enable_skip_song: boolean;
   skip_song_limit: number;
   skip_song_refill_minutes: number;
-  display_lyrics: boolean;
   karaoke_mode: boolean;
   highlight_ahead: boolean;
   request_badge_color?: string;
   boost_badge_color?: string;
   anti_burn_in: boolean;
+  party_name: string | null;
+  qr_text: string | null;
+  hide_back_button: boolean;
 }
