@@ -29,6 +29,19 @@
         },
       ]"
     >
+      <!-- Top-center: party name -->
+      <div
+        v-if="partyName"
+        class="absolute top-3 left-0 right-0 flex justify-center z-10 pointer-events-none"
+      >
+        <span
+          class="font-semibold text-white whitespace-nowrap select-none drop-shadow"
+          style="font-size: clamp(1rem, 2vw, 2rem)"
+        >
+          {{ partyName }}
+        </span>
+      </div>
+
       <!-- Top-right controls -->
       <div class="absolute top-3 right-3 flex items-center gap-2 z-10">
         <!-- Fullscreen: minimize button -->
@@ -935,7 +948,7 @@ watch(
 
 .karaoke-qr {
   position: absolute;
-  top: 2vw;
+  top: 5vw;
   left: 2vw;
   z-index: 1;
   max-width: 20vw;
