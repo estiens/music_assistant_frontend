@@ -384,9 +384,6 @@ const chromeOnAlbumArt = computed(
 const chromeTextColor = computed(() =>
   chromeOnAlbumArt.value ? "#FFFFFF" : "rgba(var(--v-theme-on-surface), 0.9)",
 );
-const chromePillBackground = computed(() =>
-  chromeOnAlbumArt.value ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.08)",
-);
 const maLogoSrc = computed(() =>
   chromeOnAlbumArt.value ? logoSrc : logoDarkSrc,
 );
