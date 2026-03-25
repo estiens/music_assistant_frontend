@@ -29,72 +29,73 @@
         },
       ]"
     >
-      <!-- Top-center: party name -->
+      <!-- Topbar -->
       <div
-        v-if="partyName"
-        class="absolute top-3 left-0 right-0 flex justify-center z-10 pointer-events-none"
+        class="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2"
+        style="background: transparent"
       >
+        <!-- Left: party name -->
         <span
-          class="font-semibold text-white whitespace-nowrap select-none drop-shadow"
-          style="font-size: clamp(1rem, 2vw, 2rem)"
+          class="font-semibold text-white whitespace-nowrap select-none"
+          style="font-size: clamp(0.9rem, 2vw, 2rem)"
         >
           {{ partyName }}
         </span>
-      </div>
 
-      <!-- Top-right controls -->
-      <div class="absolute top-3 right-3 flex items-center gap-2 z-10">
-        <!-- Fullscreen: minimize button -->
-        <Button
-          v-if="isFullscreen && !hideBackButton"
-          variant="ghost-icon"
-          size="icon-sm"
-          @click="goFullscreen(false)"
-        >
-          <Minimize2 :size="13" />
-        </Button>
-
-        <!-- Non-fullscreen: player name + actions -->
-        <template v-if="!isFullscreen">
-          <span
-            v-if="store.activePlayer"
-            class="inline-flex items-center gap-[0.4rem] py-[0.3rem] px-3 rounded-full font-medium backdrop-blur-sm text-white whitespace-nowrap select-none"
-            style="
-              font-size: clamp(0.65rem, 1vw, 0.8rem);
-              background: rgba(255, 255, 255, 0.15);
-            "
-          >
-            <Speaker :size="12" />
-            {{ store.activePlayer.name }}
-          </span>
-          <span
-            v-if="!qrAvailable"
-            class="inline-flex items-center gap-[0.4rem] py-[0.3rem] px-3 rounded-full font-medium backdrop-blur-sm whitespace-nowrap select-none"
-            style="
-              font-size: clamp(0.65rem, 1vw, 0.8rem);
-              background: rgba(234, 179, 8, 0.25);
-              color: rgb(253, 224, 71);
-            "
-          >
-            <AlertTriangle :size="12" />
-            {{ $t("providers.party.guest_access_disabled") }}
-          </span>
+        <!-- Right: controls -->
+        <div class="flex items-center gap-2">
+          <!-- Fullscreen: minimize button -->
           <Button
-            v-if="partyInstanceId"
+            v-if="isFullscreen && !hideBackButton"
             variant="ghost-icon"
             size="icon-sm"
-            @click="goToSettings"
+            @click="goFullscreen(false)"
           >
-            <Settings :size="13" />
+            <Minimize2 :size="13" />
           </Button>
-          <Button
-            variant="ghost-icon"
-            size="icon-sm"
-            @click="goFullscreen(true)"
-          >
-            <Maximize2 :size="13" />
-          </Button>
-        </template>
+
+          <!-- Non-fullscreen: player name + actions -->
+          <template v-if="!isFullscreen">
+            <span
+              v-if="store.activePlayer"
+              class="inline-flex items-center gap-[0.4rem] py-[0.3rem] px-3 rounded-full font-medium backdrop-blur-sm text-white whitespace-nowrap select-none"
+              style="
+                font-size: clamp(0.65rem, 1vw, 0.8rem);
+                background: rgba(255, 255, 255, 0.15);
+              "
+            >
+              <Speaker :size="12" />
+              {{ store.activePlayer.name }}
+            </span>
+            <span
+              v-if="!qrAvailable"
+              class="inline-flex items-center gap-[0.4rem] py-[0.3rem] px-3 rounded-full font-medium backdrop-blur-sm whitespace-nowrap select-none"
+              style="
+                font-size: clamp(0.65rem, 1vw, 0.8rem);
+                background: rgba(234, 179, 8, 0.25);
+                color: rgb(253, 224, 71);
+              "
+            >
+              <AlertTriangle :size="12" />
+              {{ $t("providers.party.guest_access_disabled") }}
+            </span>
+            <Button
+              v-if="partyInstanceId"
+              variant="ghost-icon"
+              size="icon-sm"
+              @click="goToSettings"
+            >
+              <Settings :size="13" />
+            </Button>
+            <Button
+              variant="ghost-icon"
+              size="icon-sm"
+              @click="goFullscreen(true)"
+            >
+              <Maximize2 :size="13" />
+            </Button>
+          </template>
+        </div>
       </div>
       <!-- Karaoke Mode: QR top-left, lyrics center, track stack bottom -->
       <template v-if="karaokeMode">
@@ -106,7 +107,17 @@
           <PartyQR @available="qrAvailable = $event" />
         </div>
 
-        <div class="karaoke-lyrics">
+        <div
+          class="karaoke-lyrics"
+          :style="{
+            '--karaoke-pad-left': swapped
+              ? 'clamp(1rem, 2vw, 2rem)'
+              : 'clamp(6rem, 22vw, 20rem)',
+            '--karaoke-pad-right': swapped
+              ? 'clamp(6rem, 22vw, 20rem)'
+              : 'clamp(1rem, 2vw, 2rem)',
+          }"
+        >
           <LyricsViewer
             :media-item="store.curQueueItem?.media_item"
             :position="lyricsElapsedTime"
@@ -222,7 +233,7 @@
       </template>
     </div>
     <div
-      class="absolute bottom-4 right-4 flex items-center gap-2 opacity-50 text-white font-medium"
+      class="absolute bottom-1 right-1 flex items-center gap-2 opacity-50 text-white font-medium"
     >
       <span>{{ $t("providers.party.powered_by") }}</span>
       <img :src="logoSrc" alt="Music Assistant" class="h-5 w-auto" />
@@ -950,7 +961,7 @@ watch(
   position: absolute;
   top: 5vw;
   left: 2vw;
-  z-index: 1;
+  z-index: 6;
   max-width: 20vw;
 }
 
@@ -961,7 +972,7 @@ watch(
 .karaoke-lyrics {
   flex: 1;
   width: 100%;
-  max-width: 70vw;
+  max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -969,6 +980,9 @@ watch(
   min-height: 0;
   position: relative;
   z-index: 2;
+  box-sizing: border-box;
+  padding-left: var(--karaoke-pad-left);
+  padding-right: var(--karaoke-pad-right);
 }
 
 .karaoke-lyrics :deep(.synced-content) {
@@ -1061,7 +1075,7 @@ watch(
   }
 
   .karaoke-lyrics {
-    max-width: 85vw;
+    max-width: 100%;
   }
 
   .karaoke-track-stack {
@@ -1152,6 +1166,8 @@ watch(
 
   .karaoke-lyrics {
     max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .karaoke-lyrics :deep(.synced-content) {
