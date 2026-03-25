@@ -113,6 +113,9 @@ describe("useRateLimiting", () => {
       request_badge_color: "#000000",
       boost_badge_color: "#ffffff",
       anti_burn_in: false,
+      party_name: "Test Party",
+      qr_text: "Test QR",
+      hide_back_button: false,
     };
 
     rateLimiting.configure(config);
