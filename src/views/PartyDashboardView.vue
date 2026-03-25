@@ -36,15 +36,17 @@
       >
         <!-- Left: party name -->
         <span
-          class="font-semibold whitespace-nowrap select-none"
-          :style="{ color: chromeTextColor }"
-          style="font-size: clamp(0.9rem, 2vw, 2rem)"
+          class="font-semibold select-none truncate min-w-0 mr-3"
+          :style="{
+            color: chromeTextColor,
+            fontSize: 'clamp(0.85rem, 1.5vw, 1.5rem)',
+          }"
         >
           {{ partyName }}
         </span>
 
         <!-- Right: controls -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 shrink-0">
           <!-- Fullscreen: minimize button -->
           <Button
             v-if="isFullscreen && !hideBackButton"
@@ -55,32 +57,16 @@
             <Minimize2 :size="13" />
           </Button>
 
-          <!-- Non-fullscreen: player name + actions -->
+          <!-- Non-fullscreen: actions -->
           <template v-if="!isFullscreen">
-            <span
-              v-if="store.activePlayer"
-              class="inline-flex items-center gap-[0.4rem] py-[0.3rem] px-3 rounded-full font-medium backdrop-blur-sm whitespace-nowrap select-none"
-              :style="{
-                fontSize: 'clamp(0.65rem, 1vw, 0.8rem)',
-                background: chromePillBackground,
-                color: chromeTextColor,
-              }"
-            >
-              <Speaker :size="12" />
-              {{ store.activePlayer.name }}
-            </span>
-            <span
-              v-if="!qrAvailable"
-              class="inline-flex items-center gap-[0.4rem] py-[0.3rem] px-3 rounded-full font-medium backdrop-blur-sm whitespace-nowrap select-none"
-              style="
-                font-size: clamp(0.65rem, 1vw, 0.8rem);
-                background: rgba(234, 179, 8, 0.25);
-                color: rgb(253, 224, 71);
-              "
-            >
-              <AlertTriangle :size="12" />
+            <Badge v-if="qrAvailable" variant="warning">
+              <WifiIcon :size="11" />
+              {{ $t("providers.party.guest_access_enabled") }}
+            </Badge>
+            <Badge v-else variant="info">
+              <WifiOff :size="11" />
               {{ $t("providers.party.guest_access_disabled") }}
-            </span>
+            </Badge>
             <Button
               v-if="partyInstanceId"
               variant="ghost-icon"
@@ -258,6 +244,7 @@
 import LyricsViewer from "@/components/LyricsViewer.vue";
 import PartyQR from "@/components/party/PartyQR.vue";
 import PartyTrackCard from "@/components/party/PartyTrackCard.vue";
+import { Badge } from "@/components/ui/badge";
 import Button from "@/components/ui/button/Button.vue";
 import { useLyricsElapsedTime } from "@/composables/useLyricsElapsedTime";
 import { usePartyConfig } from "@/composables/usePartyConfig";
@@ -278,12 +265,13 @@ import {
 import { store } from "@/plugins/store";
 import Color from "color";
 import {
-  AlertTriangle,
   Maximize2,
   Minimize2,
   Music,
   Settings,
   Speaker,
+  WifiIcon,
+  WifiOff,
 } from "lucide-vue-next";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
