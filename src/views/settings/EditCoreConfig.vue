@@ -132,10 +132,7 @@ const onImmediateApply = async function (
 ) {
   // Immediately apply a config value change to the backend
   // and refresh the local config with the server response
-  const updatedConfig = await api.saveCoreConfig(
-    config.value!.domain,
-    values,
-  );
+  const updatedConfig = await api.saveCoreConfig(config.value!.domain, values);
   for (const [key, entry] of Object.entries(updatedConfig.values)) {
     config.value!.values[key] = entry;
   }
