@@ -110,12 +110,16 @@
         <div
           class="karaoke-lyrics"
           :style="{
-            '--karaoke-pad-left': swapped
+            '--karaoke-pad-left': !qrAvailable
               ? 'clamp(1rem, 2vw, 2rem)'
-              : 'clamp(6rem, 22vw, 20rem)',
-            '--karaoke-pad-right': swapped
-              ? 'clamp(6rem, 22vw, 20rem)'
-              : 'clamp(1rem, 2vw, 2rem)',
+              : swapped
+                ? 'clamp(1rem, 2vw, 2rem)'
+                : 'clamp(6rem, 22vw, 20rem)',
+            '--karaoke-pad-right': !qrAvailable
+              ? 'clamp(1rem, 2vw, 2rem)'
+              : swapped
+                ? 'clamp(6rem, 22vw, 20rem)'
+                : 'clamp(1rem, 2vw, 2rem)',
           }"
         >
           <LyricsViewer
@@ -164,7 +168,13 @@
         <!-- QR Code and Lyrics -->
         <div
           v-show="qrAvailable || displayLyrics"
-          :class="['qr-section', { 'qr-section--with-lyrics': displayLyrics }]"
+          :class="[
+            'qr-section',
+            {
+              'qr-section--with-lyrics': displayLyrics,
+              'qr-section--lyrics-only': displayLyrics && !qrAvailable,
+            },
+          ]"
         >
           <div
             v-show="qrAvailable"
@@ -879,6 +889,10 @@ watch(
 .lyrics-section--full {
   flex: 1 1 100%;
   max-height: 100%;
+}
+
+.qr-section--lyrics-only {
+  flex: 1 1 100%;
 }
 
 .lyrics-section :deep(.synced-content) {
