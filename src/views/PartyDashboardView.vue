@@ -59,11 +59,21 @@
 
           <!-- Non-fullscreen: actions -->
           <template v-if="!isFullscreen">
-            <Badge v-if="qrAvailable" variant="warning">
+            <Badge
+              v-if="qrAvailable"
+              variant="warning"
+              class="cursor-pointer"
+              @click="showGuestAccessDialog = true"
+            >
               <WifiIcon :size="11" />
               {{ $t("providers.party.guest_access_enabled") }}
             </Badge>
-            <Badge v-else variant="info">
+            <Badge
+              v-else
+              variant="info"
+              class="cursor-pointer"
+              @click="showGuestAccessDialog = true"
+            >
               <WifiOff :size="11" />
               {{ $t("providers.party.guest_access_disabled") }}
             </Badge>
@@ -237,6 +247,38 @@
       <span>{{ $t("providers.party.powered_by") }}</span>
       <img :src="maLogoSrc" alt="Music Assistant" class="h-5 w-auto" />
     </div>
+
+    <!-- Guest Access Toggle Dialog -->
+    <AlertDialog v-model:open="showGuestAccessDialog">
+      <AlertDialogContent class="sm:max-w-[480px]">
+        <AlertDialogHeader class="text-left">
+          <AlertDialogTitle>
+            {{
+              qrAvailable
+                ? $t("providers.party.disable_guest_access")
+                : $t("providers.party.enable_guest_access")
+            }}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {{
+              qrAvailable
+                ? $t("providers.party.confirm_disable_guest_access")
+                : $t("providers.party.confirm_enable_guest_access")
+            }}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter class="flex-row justify-end">
+          <AlertDialogCancel class="mt-0">{{ $t("cancel") }}</AlertDialogCancel>
+          <Button :disabled="guestAccessSaving" @click="toggleGuestAccess">
+            {{
+              qrAvailable
+                ? $t("providers.party.disable_guest_access")
+                : $t("providers.party.enable_guest_access")
+            }}
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>
 
@@ -244,6 +286,15 @@
 import LyricsViewer from "@/components/LyricsViewer.vue";
 import PartyQR from "@/components/party/PartyQR.vue";
 import PartyTrackCard from "@/components/party/PartyTrackCard.vue";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import Button from "@/components/ui/button/Button.vue";
 import { useLyricsElapsedTime } from "@/composables/useLyricsElapsedTime";
@@ -303,6 +354,26 @@ const antiBurnIn = ref(false); // Swap QR/track sides periodically
 const swapped = ref(false); // Current swap state for anti burn-in
 let burnInInterval: ReturnType<typeof setInterval> | null = null;
 const accessError = ref("");
+const showGuestAccessDialog = ref(false);
+const guestAccessSaving = ref(false);
+
+const toggleGuestAccess = async () => {
+  if (!partyInstanceId.value) return;
+  guestAccessSaving.value = true;
+  try {
+    await api.saveProviderConfig(
+      "party",
+      { enable_guest_access: !qrAvailable.value },
+      partyInstanceId.value,
+    );
+    showGuestAccessDialog.value = false;
+  } catch (error) {
+    console.error("Failed to toggle guest access:", error);
+  } finally {
+    guestAccessSaving.value = false;
+  }
+};
+
 // Badge colors (hex values from config)
 const requestBadgeColor = ref("");
 const boostBadgeColor = ref("");
