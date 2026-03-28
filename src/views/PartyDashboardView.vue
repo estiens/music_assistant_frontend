@@ -26,6 +26,7 @@
         {
           'party-content--karaoke': karaokeMode,
           'party-content--album-art': useAlbumArtBackground && !!albumArtUrl,
+          'party-content--light-text': useLightChrome,
         },
       ]"
     >
@@ -155,7 +156,7 @@
               :is-playing="isPlaying"
               :request-badge-color="requestBadgeColor"
               :boost-badge-color="boostBadgeColor"
-              :force-white-text="useAlbumArtBackground && !!albumArtUrl"
+              :force-white-text="useLightChrome"
             />
           </TransitionGroup>
         </div>
@@ -234,7 +235,7 @@
               :is-playing="isPlaying"
               :request-badge-color="requestBadgeColor"
               :boost-badge-color="boostBadgeColor"
-              :force-white-text="useAlbumArtBackground && !!albumArtUrl"
+              :force-white-text="useLightChrome"
             />
           </TransitionGroup>
         </div>
@@ -326,9 +327,8 @@ import {
 } from "lucide-vue-next";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { useTheme } from "vuetify";
+import { useColorMode } from "@vueuse/core";
 
-const theme = useTheme();
 const router = useRouter();
 const { config: partyConfig, fetchConfig } = usePartyConfig();
 const logoSrc = new URL("@/assets/logo/logo.svg", import.meta.url).href;
@@ -378,17 +378,30 @@ const toggleGuestAccess = async () => {
 const requestBadgeColor = ref("");
 const boostBadgeColor = ref("");
 const isFullscreen = computed(() => store.frameless);
-const chromeOnAlbumArt = computed(
+const colorMode = useColorMode();
+const isDark = computed(() => colorMode.value === "dark");
+const darkBackground = computed(
   () => useAlbumArtBackground.value && !!albumArtUrl.value,
 );
+const gradientNeedsLightText = computed(() => {
+  if (darkBackground.value) return false;
+  const coverImageColorCode = isDark.value
+    ? colorPalette.value.darkColor || "#1a1a1a"
+    : colorPalette.value.lightColor || "#f5f5f5";
+  const bgColor = Color(coverImageColorCode);
+  return Color("white").contrast(bgColor) >= Color("black").contrast(bgColor);
+});
+const useLightChrome = computed(
+  () => darkBackground.value || gradientNeedsLightText.value,
+);
 const chromeTextColor = computed(() =>
-  chromeOnAlbumArt.value ? "#FFFFFF" : "rgba(var(--v-theme-on-surface), 0.9)",
+  useLightChrome.value ? "#FFFFFF" : "rgba(var(--v-theme-on-surface), 0.9)",
 );
 const maLogoSrc = computed(() =>
-  chromeOnAlbumArt.value ? logoSrc : logoDarkSrc,
+  useLightChrome.value ? logoSrc : logoDarkSrc,
 );
 const qrDarkColor = computed(() =>
-  chromeOnAlbumArt.value ? "#FFFFFF" : "#000000",
+  useLightChrome.value ? "#FFFFFF" : "#000000",
 );
 
 const partyName = computed(() => partyConfig.value?.party_name ?? null);
@@ -495,11 +508,7 @@ const fetchLyrics = async () => {
 
 const lyricsEnabled = computed(() => karaokeMode.value);
 const lyricsTextColor = computed(() =>
-  albumArtUrl.value
-    ? "#FFFFFF"
-    : theme.current.value.dark
-      ? "#FFFFFF"
-      : "#000000",
+  albumArtUrl.value ? "#FFFFFF" : isDark.value ? "#FFFFFF" : "#000000",
 );
 const { elapsedTime: lyricsElapsedTime, stop: stopTick } =
   useLyricsElapsedTime(lyricsEnabled);
@@ -648,15 +657,15 @@ watch(
         img.src = imageUrl;
       }
     } else {
-      // Fallback to default colors
+      // Reset to empty so the gradient computed picks theme-aware fallbacks
       colorPalette.value = {
         "0": "",
         "1": "",
         "2": "",
         "3": "",
         "4": "",
-        lightColor: theme.current.value.dark ? "#1a1a1a" : "#f5f5f5",
-        darkColor: theme.current.value.dark ? "#0a0a0a" : "#e0e0e0",
+        lightColor: "",
+        darkColor: "",
       };
     }
   },
@@ -681,7 +690,7 @@ const gradientBackgroundStyle = computed(() => {
   const MIN_CONTRAST = 5;
   const ADJUSTMENT_INCREMENT = 0.05;
 
-  const coverImageColorCode = theme.current.value.dark
+  const coverImageColorCode = isDark.value
     ? colorPalette.value.darkColor || "#1a1a1a"
     : colorPalette.value.lightColor || "#f5f5f5";
 
@@ -925,7 +934,9 @@ watch(
 }
 
 .party-content--album-art,
-.party-content--album-art * {
+.party-content--album-art *,
+.party-content--light-text,
+.party-content--light-text * {
   color: white !important;
 }
 
