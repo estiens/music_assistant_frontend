@@ -10,12 +10,11 @@
           :color-palette="coverImageColorPalette"
           :primary-color="$vuetify.theme.current.dark ? '#fff' : '#000'"
         />
-      </div>
-      <!-- favorite button for current track -->
-      <div class="mediacontrols-favorite">
+        <!-- favorite button for current track -->
         <FavoriteButton
-          v-if="store.curQueueItem?.media_item && getBreakpointValue('bp8')"
+          v-if="store.curQueueItem?.media_item && getBreakpointValue('bp7')"
           :item="store.curQueueItem.media_item"
+          class="mediacontrols-favorite"
         />
       </div>
       <div class="mediacontrols-bottom-center">
@@ -220,7 +219,8 @@ watch(
   padding: 10px 15px;
   background-color: rgb(var(--v-theme-overlay));
   .mediacontrols-bottom-center {
-    width: 40%;
+    flex: 0 1 40%;
+    min-width: 0;
   }
 
   &[data-mobile="true"] {
@@ -232,6 +232,7 @@ watch(
     .mediacontrols-left {
       flex: 1;
       min-width: 0;
+      max-width: none;
     }
   }
 }
@@ -260,21 +261,26 @@ watch(
 }
 
 .mediacontrols-left {
-  width: 20%;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   > div {
     padding: 0px !important;
+    min-width: 0;
   }
 }
 
 .mediacontrols-favorite {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-inline-end: auto;
+  flex-shrink: 0;
 }
 
 .mediacontrols-bottom-right {
-  margin-inline-start: auto;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
   > div {
     display: inline-flex;
     align-items: center;
