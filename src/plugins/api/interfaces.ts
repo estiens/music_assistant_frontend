@@ -1238,4 +1238,5 @@ export interface PartyConfig {
   party_name: string | null;
   qr_text: string | null;
   hide_back_button: boolean;
+  show_progress_bar: boolean;
 }
