@@ -11,6 +11,13 @@
           :primary-color="$vuetify.theme.current.dark ? '#fff' : '#000'"
         />
       </div>
+      <!-- favorite button for current track -->
+      <div class="mediacontrols-favorite">
+        <FavoriteButton
+          v-if="store.curQueueItem?.media_item && getBreakpointValue('bp3')"
+          :item="store.curQueueItem.media_item"
+        />
+      </div>
       <div class="mediacontrols-bottom-center">
         <!-- player control buttons -->
         <PlayerControls
@@ -124,6 +131,7 @@ import { getBreakpointValue } from "@/plugins/breakpoint";
 import { store } from "@/plugins/store";
 import vuetify from "@/plugins/vuetify";
 import { computed, ref, watch } from "vue";
+import FavoriteButton from "@/components/FavoriteButton.vue";
 import PlayerControls from "./PlayerControls.vue";
 import PlayerExtendedControls from "./PlayerExtendedControls.vue";
 import PlayerTimeline from "./PlayerTimeline.vue";
@@ -252,11 +260,17 @@ watch(
 }
 
 .mediacontrols-left {
-  margin-inline-end: auto;
   width: 20%;
   > div {
     padding: 0px !important;
   }
+}
+
+.mediacontrols-favorite {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline-end: auto;
 }
 
 .mediacontrols-bottom-right {
