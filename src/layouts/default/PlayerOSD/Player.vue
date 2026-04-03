@@ -14,7 +14,7 @@
       <!-- favorite button for current track -->
       <div class="mediacontrols-favorite">
         <FavoriteButton
-          v-if="store.curQueueItem?.media_item && getBreakpointValue('bp3')"
+          v-if="store.curQueueItem?.media_item && getBreakpointValue('bp8')"
           :item="store.curQueueItem.media_item"
         />
       </div>
