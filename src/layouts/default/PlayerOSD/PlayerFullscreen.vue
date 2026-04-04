@@ -1240,13 +1240,18 @@ const loadNextPage = async function () {
   loadingMore.value = true;
   const pageSize = 50;
   const offset = queueItems.value.length;
+  // On first load, ensure we fetch enough items to cover past the current
+  // index so that nextItems (which slices from current_index) has data.
+  const minNeeded = (store.activePlayerQueue.current_index || 0) + pageSize;
+  const limit =
+    offset === 0 ? Math.max(pageSize, minNeeded - offset) : pageSize;
   const result = await api.getPlayerQueueItems(
     store.activePlayerQueue.queue_id,
-    pageSize,
+    limit,
     offset,
   );
   queueItems.value.push(...result);
-  if (result.length < pageSize) {
+  if (result.length < limit) {
     allItemsLoaded.value = true;
   }
   loadingMore.value = false;
