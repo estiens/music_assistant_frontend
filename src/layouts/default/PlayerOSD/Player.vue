@@ -12,7 +12,11 @@
         />
         <!-- favorite button for current track -->
         <FavoriteButton
-          v-if="store.curQueueItem?.media_item && getBreakpointValue('bp7')"
+          v-if="
+            store.curQueueItem?.media_item &&
+            getBreakpointValue('bp7') &&
+            store.activePlayer?.powered !== false
+          "
           :item="store.curQueueItem.media_item"
           class="mediacontrols-favorite"
         />
