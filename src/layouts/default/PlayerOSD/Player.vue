@@ -10,16 +10,6 @@
           :color-palette="coverImageColorPalette"
           :primary-color="$vuetify.theme.current.dark ? '#fff' : '#000'"
         />
-        <!-- favorite button for current track -->
-        <FavoriteButton
-          v-if="
-            store.curQueueItem?.media_item &&
-            getBreakpointValue('bp7') &&
-            store.activePlayer?.powered !== false
-          "
-          :item="store.curQueueItem.media_item"
-          class="mediacontrols-favorite"
-        />
       </div>
       <div class="mediacontrols-bottom-center">
         <!-- player control buttons -->
@@ -62,6 +52,7 @@
             }"
             :volume="{
               isVisible: store.activePlayer != undefined,
+              volumeSize: getBreakpointValue('bp8') ? '150px' : '100px',
             }"
           />
         </div>
@@ -134,7 +125,6 @@ import { getBreakpointValue } from "@/plugins/breakpoint";
 import { store } from "@/plugins/store";
 import vuetify from "@/plugins/vuetify";
 import { computed, ref, watch } from "vue";
-import FavoriteButton from "@/components/FavoriteButton.vue";
 import PlayerControls from "./PlayerControls.vue";
 import PlayerExtendedControls from "./PlayerExtendedControls.vue";
 import PlayerTimeline from "./PlayerTimeline.vue";
@@ -274,10 +264,6 @@ watch(
     padding: 0px !important;
     min-width: 0;
   }
-}
-
-.mediacontrols-favorite {
-  flex-shrink: 0;
 }
 
 .mediacontrols-bottom-right {
