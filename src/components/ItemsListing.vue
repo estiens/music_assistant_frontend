@@ -1217,7 +1217,13 @@ const restoreSettings = async function () {
   }
 
   // get stored/default provider filter for this itemtype
-  if (props.showProviderFilter === true && prefs.providerFilter) {
+  // only apply stored filter if there are multiple providers available
+  // with a single provider, any stored filter is either redundant or stale
+  if (
+    props.showProviderFilter === true &&
+    prefs.providerFilter &&
+    musicProviders.value.length > 1
+  ) {
     params.value.provider = prefs.providerFilter;
   }
 
