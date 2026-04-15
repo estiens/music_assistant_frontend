@@ -231,6 +231,7 @@ import {
   ProviderFeature,
   ProviderMapping,
   QueueOption,
+  Radio,
   Track,
 } from "@/plugins/api/interfaces";
 import { authManager } from "@/plugins/auth";
@@ -739,6 +740,49 @@ export const getContextMenuItems = async function (
       },
       icon: "mdi-image-album",
     });
+  }
+  // edit item (for builtin provider items that support editing)
+  if (
+    items.length === 1 &&
+    items[0] == parentItem &&
+    items[0].provider === "library" &&
+    "provider_mappings" in items[0] &&
+    [MediaType.RADIO, MediaType.TRACK, MediaType.PLAYLIST].includes(
+      items[0].media_type,
+    )
+  ) {
+    const item = items[0] as Radio | Track | Playlist;
+    const hasBuiltinProvider = item.provider_mappings?.some(
+      (pm) => pm.provider_domain === "builtin",
+    );
+    const builtinProvider = api.getProvider("builtin");
+    const featureMap: Record<string, ProviderFeature> = {
+      [MediaType.RADIO]: ProviderFeature.LIBRARY_RADIOS_EDIT,
+      [MediaType.TRACK]: ProviderFeature.LIBRARY_TRACKS_EDIT,
+      [MediaType.PLAYLIST]: ProviderFeature.LIBRARY_PLAYLISTS_EDIT,
+    };
+    const labelMap: Record<string, string> = {
+      [MediaType.RADIO]: "edit_radio",
+      [MediaType.TRACK]: "edit_track",
+      [MediaType.PLAYLIST]: "edit_playlist",
+    };
+    const supportsEdit = builtinProvider?.supported_features?.includes(
+      featureMap[item.media_type],
+    );
+    // For playlists, also check is_editable flag (builtin special playlists are not editable)
+    const isEditablePlaylist =
+      item.media_type !== MediaType.PLAYLIST ||
+      (item as Playlist).is_editable !== false;
+    if (hasBuiltinProvider && supportsEdit && isEditablePlaylist) {
+      contextMenuItems.push({
+        label: labelMap[item.media_type],
+        labelArgs: [],
+        action: () => {
+          eventbus.emit("editItemDialog", item);
+        },
+        icon: "mdi-pencil",
+      });
+    }
   }
   // refresh item
   if (
